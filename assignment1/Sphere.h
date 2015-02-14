@@ -2,17 +2,23 @@
 #define SPHERE_H
 
 #include "Shape.h"
+#include "FaceList.h"
 
 class Sphere : public Shape {
+
 public:
-	Sphere() {};
+	Sphere();
 	~Sphere() {};
 
-	void draw() {
-	};
+	void draw();
 
-	void drawNormal() {
-	};
+	void drawNormal() {};
+
+	void makeFaceList();
+
+protected:
+
+	FaceList *faceList;
+
 };
-
 #endif
