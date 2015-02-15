@@ -12,7 +12,7 @@ public:
 
 	void draw();
 
-	void drawNormal() {};
+	void drawNormal();
 
 	void makeFaceList();
 

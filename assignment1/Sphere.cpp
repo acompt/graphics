@@ -116,8 +116,16 @@ void Sphere::makeFaceList() {
 	 		v3 = getVert(radius, theta, phi + addPhi);
 	 		v4 = getVert(radius, theta + addTheta, phi + addPhi);
 
-			faceList->addFace(v1, v4, v3, 0.0, 0.0, 0.0);
-			faceList->addFace(v1, v2, v4, 0.0, 0.0, 0.0);
+	 		Vector vec1(v1.x - v4.x, v1.y - v4.y, v1.z - v4.z);
+			Vector vec2(v1.x - v3.x, v1.y - v3.y, v1.z - v3.z);
+			Vector vec3 = cross(vec1, vec2);
+
+			Vector vec6(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
+			Vector vec4(v1.x - v4.x, v1.y - v4.y, v1.z - v4.z);
+			Vector vec5 = cross(vec6, vec4);
+
+			faceList->addFace(v1, v4, v3, 5*vec3.at(0), 5*vec3.at(1), 5*vec3.at(2));
+			faceList->addFace(v1, v2, v4, 5*vec5.at(0), 5*vec5.at(1), 5*vec5.at(2));
 
 			theta = theta + addTheta;
 		}
@@ -144,6 +152,27 @@ static Vertex getVert(double r, double theta, double phi) {
 	return toReturn;
 }
 
+void Sphere::drawNormal() {
+	Face face;
+
+	for (int i = 0; i < faceList->getLength(); i++) {
+		face = faceList->getFace(i);
+		glBegin(GL_LINES);
+		glVertex3f(face.a.x, face.a.y, face.a.z);
+		glVertex3f(face.a.x + face.nx, face.a.y + face.ny, face.a.z + face.nz);
+		glEnd();
+		glBegin(GL_LINES);
+		glVertex3f(face.b.x, face.b.y, face.b.z);
+		glVertex3f(face.b.x + face.nx, face.b.y + face.ny, face.b.z + face.nz);
+		glEnd();
+
+		glBegin(GL_LINES);
+		glVertex3f(face.c.x, face.c.y, face.c.z);
+		glVertex3f(face.c.x + face.nx, face.c.y + face.ny, face.c.z + face.nz);
+
+		glEnd();
+	}
+}
 
 
 
