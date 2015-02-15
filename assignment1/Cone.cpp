@@ -126,8 +126,12 @@ void Cone::makeFaceList() {
 		vertex3.y = -0.5f;
 		vertex3.status = true;
 
+		Vector v1(vertex1.x - vertex2.x, vertex1.y - vertex2.y, vertex1.z - vertex2.z);
+		Vector v2(vertex1.x - vertex3.x, vertex1.y - vertex3.y, vertex1.z - vertex3.z);
+		Vector v3 = cross(v1, v2);
+
 		//make bottom faces
-		faceList->addFace(vertex1, vertex2, vertex3, initX, initY, initZ);
+		faceList->addFace(vertex1, vertex2, vertex3, v3.at(0), v3.at(1), v3.at(2));
 		theta += addTheta;
 	}
 
@@ -185,7 +189,10 @@ void Cone::makeFaceList() {
 				v3.y = v1.y + udY;
 				v3.z = v1.z + udZ;
 
-				faceList->addFace(v1, v2, v3, 0.0, 0.0, 0.0);
+				Vector vec1(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
+				Vector vec2(v1.x - v3.x, v1.y - v3.y, v1.z - v3.z);
+				Vector vec3 = cross(vec1, vec2);
+				faceList->addFace(v1, v2, v3, 25*vec3.at(0), 25*vec3.at(1), 25*vec3.at(2));
 
 
 				if ((i + 1) < h) {
@@ -193,8 +200,11 @@ void Cone::makeFaceList() {
 					v1.y = v3.y;
 					v1.z = v3.z + dZ;
 
-					faceList->addFace(v3, v2, v1, 0.0, 0.0, 0.0);
+					Vector vec4(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
+					Vector vec5(v1.x - v3.x, v1.y - v3.y, v1.z - v3.z);
+					Vector vec6 = cross(vec4, vec5);
 
+					faceList->addFace(v3, v2, v1, 25*vec6.at(0), 25*vec6.at(1), 25*vec6.at(2));
 				}
 
 				v1 = v2;
@@ -213,6 +223,28 @@ void Cone::makeFaceList() {
 
 
 
+}
+
+void Cone::drawNormal() {
+	Face face;
+
+	for (int i = 0; i < faceList->getLength(); i++) {
+		face = faceList->getFace(i);
+		glBegin(GL_LINES);
+		glVertex3f(face.a.x, face.a.y, face.a.z);
+		glVertex3f(face.a.x + face.nx, face.a.y + face.ny, face.a.z + face.nz);
+		glEnd();
+		glBegin(GL_LINES);
+		glVertex3f(face.b.x, face.b.y, face.b.z);
+		glVertex3f(face.b.x + face.nx, face.b.y + face.ny, face.b.z + face.nz);
+		glEnd();
+
+		glBegin(GL_LINES);
+		glVertex3f(face.c.x, face.c.y, face.c.z);
+		glVertex3f(face.c.x + face.nx, face.c.y + face.ny, face.c.z + face.nz);
+
+		glEnd();
+	}
 }
 
 
