@@ -68,6 +68,8 @@ void Cone::draw() {
 		//setNormal(x1, y1, z1, x2, y2, z2, x3, y3, z3); // makes sure that each 
                                                    // vertex is correctly 
                                                    // scaled
+		glNormal3f(face.nx, face.ny, face.nz);
+
 		glVertex3f(x1, y1, z1);  // set the three vertices for the triangle
 		glVertex3f(x2, y2, z2);  // the direction of the front face depends 
 		glVertex3f(x3, y3, z3);  // on the order in which you put the vertices
@@ -129,6 +131,7 @@ void Cone::makeFaceList() {
 		Vector v1(vertex1.x - vertex2.x, vertex1.y - vertex2.y, vertex1.z - vertex2.z);
 		Vector v2(vertex1.x - vertex3.x, vertex1.y - vertex3.y, vertex1.z - vertex3.z);
 		Vector v3 = cross(v1, v2);
+		v3.normalize();
 
 		//make bottom faces
 		faceList->addFace(vertex1, vertex2, vertex3, v3.at(0), v3.at(1), v3.at(2));
@@ -191,8 +194,9 @@ void Cone::makeFaceList() {
 
 				Vector vec1(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
 				Vector vec2(v1.x - v3.x, v1.y - v3.y, v1.z - v3.z);
-				Vector vec3 = cross(vec1, vec2);
-				faceList->addFace(v1, v2, v3, 25*vec3.at(0), 25*vec3.at(1), 25*vec3.at(2));
+				Vector vec3 = cross(vec2, vec1);
+				vec3.normalize();
+				faceList->addFace(v1, v2, v3, vec3.at(0), vec3.at(1), vec3.at(2));
 
 
 				if ((i + 1) < h) {
@@ -203,8 +207,9 @@ void Cone::makeFaceList() {
 					Vector vec4(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
 					Vector vec5(v1.x - v3.x, v1.y - v3.y, v1.z - v3.z);
 					Vector vec6 = cross(vec4, vec5);
+					vec6.normalize();
 
-					faceList->addFace(v3, v2, v1, 25*vec6.at(0), 25*vec6.at(1), 25*vec6.at(2));
+					faceList->addFace(v3, v2, v1, vec6.at(0), vec6.at(1), vec6.at(2));
 				}
 
 				v1 = v2;
@@ -233,13 +238,10 @@ void Cone::drawNormal() {
 		glBegin(GL_LINES);
 		glVertex3f(face.a.x, face.a.y, face.a.z);
 		glVertex3f(face.a.x + face.nx, face.a.y + face.ny, face.a.z + face.nz);
-		glEnd();
-		glBegin(GL_LINES);
+
 		glVertex3f(face.b.x, face.b.y, face.b.z);
 		glVertex3f(face.b.x + face.nx, face.b.y + face.ny, face.b.z + face.nz);
-		glEnd();
 
-		glBegin(GL_LINES);
 		glVertex3f(face.c.x, face.c.y, face.c.z);
 		glVertex3f(face.c.x + face.nx, face.c.y + face.ny, face.c.z + face.nz);
 

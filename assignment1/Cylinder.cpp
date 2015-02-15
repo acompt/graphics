@@ -62,6 +62,7 @@ void Cylinder::draw() {
 		//setNormal(x1, y1, z1, x2, y2, z2, x3, y3, z3); // makes sure that each 
                                                    // vertex is correctly 
                                                    // scaled
+		glNormal3f(face.nx, face.ny, face.nz);
 		glVertex3f(x1, y1, z1);  // set the three vertices for the triangle
 		glVertex3f(x2, y2, z2);  // the direction of the front face depends 
 		glVertex3f(x3, y3, z3);  // on the order in which you put the vertices
@@ -78,13 +79,10 @@ void Cylinder::drawNormal() {
 		glBegin(GL_LINES);
 		glVertex3f(face.a.x, face.a.y, face.a.z);
 		glVertex3f(face.a.x + face.nx, face.a.y + face.ny, face.a.z + face.nz);
-		glEnd();
-		glBegin(GL_LINES);
+
 		glVertex3f(face.b.x, face.b.y, face.b.z);
 		glVertex3f(face.b.x + face.nx, face.b.y + face.ny, face.b.z + face.nz);
-		glEnd();
 
-		glBegin(GL_LINES);
 		glVertex3f(face.c.x, face.c.y, face.c.z);
 		glVertex3f(face.c.x + face.nx, face.c.y + face.ny, face.c.z + face.nz);
 
@@ -138,9 +136,10 @@ void Cylinder::makeLid(float theta, float initX, float initY, float initZ,
 		Vector v1(vertex1.x - vertex2.x, vertex1.y - vertex2.y, vertex1.z - vertex2.z);
 		Vector v2(vertex1.x - vertex3.x, vertex1.y - vertex3.y, vertex1.z - vertex3.z);
 		Vector v3 = cross(v1, v2);
+		v3.normalize();
 
 		//make bottom faces
-		faceList->addFace(vertex1, vertex2, vertex3, v3.at(0), v3.at(1), v3.at(2));
+		faceList->addFace(vertex2, vertex3, vertex1, v3.at(0), v3.at(1), v3.at(2));
 		//make top faces
 		vertex3.y = 0.5f;
 		vertex2.y = 0.5f;
@@ -149,6 +148,7 @@ void Cylinder::makeLid(float theta, float initX, float initY, float initZ,
 		Vector v5(vertex1.x - vertex2.x, vertex1.y - vertex2.y, vertex1.z - vertex2.z);
 		Vector v4(vertex1.x - vertex3.x, vertex1.y - vertex3.y, vertex1.z - vertex3.z);
 		v3 = cross(v5, v4);
+		v3.normalize();
 
 		faceList->addFace(vertex1, vertex2, vertex3, -v3.at(0), -v3.at(1), -v3.at(2));
 		theta += addTheta;
@@ -185,13 +185,15 @@ void Cylinder::makeSides(float theta, float initX, float initY, float initZ,
 			Vector v1(vertex1.x - vertex2.x, vertex1.y - vertex2.y, vertex1.z - vertex2.z);
 			Vector v2(vertex1.x - vertex3.x, vertex1.y - vertex3.y, vertex1.z - vertex3.z);
 			Vector v3 = cross(v1, v2);
-			faceList->addFace(vertex1, vertex2, vertex3, 5*v3.at(0), 5*v3.at(1), 5*v3.at(2));
+			v3.normalize();
+			faceList->addFace(vertex1, vertex2, vertex3, v3.at(0), v3.at(1), v3.at(2));
 
 			Vector v6(vertex4.x - vertex2.x, vertex4.y - vertex2.y, vertex4.z - vertex2.z);
 			Vector v4(vertex4.x - vertex3.x, vertex4.y - vertex3.y, vertex4.z - vertex3.z);
-			Vector v5 = cross(v6, v4);
+			Vector v5 = cross(v4, v6);
+			v5.normalize();
 
-			faceList->addFace(vertex4, vertex2, vertex3, 5*v5.at(0), 5*v5.at(1), 5*v5.at(2));
+			faceList->addFace(vertex4, vertex3, vertex2, v5.at(0), v5.at(1), v5.at(2));
 
 			theta += addTheta;
 		} 

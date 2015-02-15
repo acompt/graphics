@@ -69,6 +69,8 @@ void Sphere::draw() {
 		//setNormal(x1, y1, z1, x2, y2, z2, x3, y3, z3); // makes sure that each 
                                                    // vertex is correctly 
                                                    // scaled
+		glNormal3f(face.nx, face.ny, face.nz);
+
 		glVertex3f(x1, y1, z1);  // set the three vertices for the triangle
 		glVertex3f(x2, y2, z2);  // the direction of the front face depends 
 		glVertex3f(x3, y3, z3);  // on the order in which you put the vertices
@@ -119,13 +121,15 @@ void Sphere::makeFaceList() {
 	 		Vector vec1(v1.x - v4.x, v1.y - v4.y, v1.z - v4.z);
 			Vector vec2(v1.x - v3.x, v1.y - v3.y, v1.z - v3.z);
 			Vector vec3 = cross(vec1, vec2);
+			vec3.normalize();
 
 			Vector vec6(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
 			Vector vec4(v1.x - v4.x, v1.y - v4.y, v1.z - v4.z);
 			Vector vec5 = cross(vec6, vec4);
+			vec5.normalize();
 
-			faceList->addFace(v1, v4, v3, 5*vec3.at(0), 5*vec3.at(1), 5*vec3.at(2));
-			faceList->addFace(v1, v2, v4, 5*vec5.at(0), 5*vec5.at(1), 5*vec5.at(2));
+			faceList->addFace(v1, v4, v3, vec3.at(0), vec3.at(1), vec3.at(2));
+			faceList->addFace(v1, v2, v4, vec5.at(0), vec5.at(1), vec5.at(2));
 
 			theta = theta + addTheta;
 		}
@@ -157,16 +161,14 @@ void Sphere::drawNormal() {
 
 	for (int i = 0; i < faceList->getLength(); i++) {
 		face = faceList->getFace(i);
+		
 		glBegin(GL_LINES);
 		glVertex3f(face.a.x, face.a.y, face.a.z);
 		glVertex3f(face.a.x + face.nx, face.a.y + face.ny, face.a.z + face.nz);
-		glEnd();
-		glBegin(GL_LINES);
+
 		glVertex3f(face.b.x, face.b.y, face.b.z);
 		glVertex3f(face.b.x + face.nx, face.b.y + face.ny, face.b.z + face.nz);
-		glEnd();
 
-		glBegin(GL_LINES);
 		glVertex3f(face.c.x, face.c.y, face.c.z);
 		glVertex3f(face.c.x + face.nx, face.c.y + face.ny, face.c.z + face.nz);
 
