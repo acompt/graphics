@@ -75,6 +75,7 @@ void Coil::draw() {
 		//setNormal(x1, y1, z1, x2, y2, z2, x3, y3, z3); // makes sure that each 
                                                    // vertex is correctly 
                                                    // scaled
+		glNormal3f(face.nx, face.ny, face.nz);
 		glVertex3f(x1, y1, z1);  // set the three vertices for the triangle
 		glVertex3f(x2, y2, z2);  // the direction of the front face depends 
 		glVertex3f(x3, y3, z3);  // on the order in which you put the vertices
@@ -111,8 +112,18 @@ void Coil::makeFaceList() {
  			v3 = getOutVert(vEnd, theta + addTheta, phi + addPhi);
  			v4 = getOutVert(vStart, theta, phi + addPhi);
 
-			faceList->addFace(v1, v2, v4, 0.0, 0.0, 0.0);
-			faceList->addFace(v2, v3, v4, 0.0, 0.0, 0.0);
+ 			Vector vec1(v2.x - v4.x, v2.y - v4.y, v2.z - v4.z);
+			Vector vec2(v2.x - v3.x, v2.y - v3.y, v2.z - v3.z);
+			Vector vec3 = cross(vec2, vec1);
+			vec3.normalize();
+
+			Vector vec6(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
+			Vector vec4(v1.x - v4.x, v1.y - v4.y, v1.z - v4.z);
+			Vector vec5 = cross(vec6, vec4);
+			vec5.normalize();
+
+			faceList->addFace(v1, v2, v4, vec5.at(0), vec5.at(1), vec5.at(2));
+			faceList->addFace(v2, v3, v4, vec3.at(0), vec3.at(1), vec3.at(2));
 
  			phi += addPhi;
  		}
@@ -141,8 +152,19 @@ void Coil::makeFaceList() {
 		v3 = getOutVert(eCent, 0.0, phi);
 		v4 = getOutVert(eCent, 0.0, phi + addPhi);
 
-		faceList->addFace(v1, v2, bCent, 0.0, 0.0, 0.0);
-		faceList->addFace(v3, eCent, v4, 0.0, 0.0, 0.0);
+		Vector vec1(v1.x - bCent.x, v1.y - bCent.y, v1.z - bCent.z);
+		Vector vec2(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
+		Vector vec3 = cross(vec1, vec2);
+		vec3.normalize();
+
+		Vector vec6(v3.x - eCent.x, v3.y - eCent.y, v3.z - eCent.z);
+		Vector vec4(v3.x - v4.x, v3.y - v4.y, v3.z - v4.z);
+		Vector vec5 = cross(vec6, vec4);
+		vec5.normalize();
+
+
+		faceList->addFace(v1, v2, bCent, vec3.at(0), vec3.at(1), vec3.at(2));
+		faceList->addFace(v3, eCent, v4, vec5.at(0), vec5.at(1), vec5.at(2));
 
  		phi += addPhi;
 	}
@@ -176,6 +198,24 @@ static Vertex getOutVert(Vertex cent, double theta, double phi) {
 
 }
 
+void Coil::drawNormal() {
+	Face face;
+
+	for (int i = 0; i < faceList->getLength(); i++) {
+		face = faceList->getFace(i);
+		glBegin(GL_LINES);
+		glVertex3f(face.a.x, face.a.y, face.a.z);
+		glVertex3f(face.a.x + face.nx, face.a.y + face.ny, face.a.z + face.nz);
+
+		glVertex3f(face.b.x, face.b.y, face.b.z);
+		glVertex3f(face.b.x + face.nx, face.b.y + face.ny, face.b.z + face.nz);
+
+		glVertex3f(face.c.x, face.c.y, face.c.z);
+		glVertex3f(face.c.x + face.nx, face.c.y + face.ny, face.c.z + face.nz);
+
+		glEnd();
+	}
+}
 
 
 
