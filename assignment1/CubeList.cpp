@@ -4,15 +4,13 @@ Adam Piel & Andrea Compton
 apiel02     acompt01
 
 Tufts COMP 175: Assignment 1: Shapes
-Due Wednesday, Feb 11, 2015
+Due Monday, Feb 16, 2015
 
 File name: CubeList.cpp
 
-Description:
-
-
 
 ****************************************************************************/
+
 
 #include <GL/glui.h>
 #include "Shape.h"
