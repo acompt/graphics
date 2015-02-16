@@ -36,10 +36,6 @@ void Cylinder::draw() {
 	float x2, y2, z2;
 	float x3, y3, z3;
 
-	// if(vertexList==NULL || faceList==NULL){
-	// 	return;
-	// }
-
 	for (int i = 0; i < faceList->getLength(); i++) {
 		Face face = faceList->getFace(i);
 		x1 = face.a.x;
@@ -56,9 +52,6 @@ void Cylinder::draw() {
 
 		glBegin(GL_TRIANGLES); // sets the shapes that openGL draws and determines
                            // the number of vertices that are necessary
-		//setNormal(x1, y1, z1, x2, y2, z2, x3, y3, z3); // makes sure that each 
-                                                   // vertex is correctly 
-                                                   // scaled
 		glNormal3f(face.nx, face.ny, face.nz);
 		glVertex3f(x1, y1, z1);  // set the three vertices for the triangle
 		glVertex3f(x2, y2, z2);  // the direction of the front face depends 

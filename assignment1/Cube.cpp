@@ -63,7 +63,8 @@ void Cube::draw()
 }
 
 
-void Cube::drawFace(float xc, float yc, float zc, float dirx, float diry, float dirz, float norm)
+void Cube::drawFace(float xc, float yc, float zc, float dirx, 
+					float diry, float dirz, float norm)
 {
 
 	float ax = xc;
@@ -79,7 +80,8 @@ void Cube::drawFace(float xc, float yc, float zc, float dirx, float diry, float 
 
 	float xnorm, ynorm, znorm;
 
-	/* Determine terminating points for both the cross, and down (relative) directions. */
+	/* Determine terminating points for both the cross, 
+		and down (relative) directions. */
 	if (dirx != 0){
 		cross_term = dirx * ((float)(edge_length)) / 2;
 		c_ptr = &ax;

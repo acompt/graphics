@@ -9,7 +9,8 @@ Due Monday, Feb 16, 2015
 File name: FaceList.h
 
 
-****************************************************************************/#ifndef FACELIST_H
+****************************************************************************/
+#ifndef FACELIST_H
 #define FACELIST_H
 
 struct Vertex {
@@ -36,16 +37,11 @@ public:
 
 	int getLength();
 
-
-
-
 protected:
 
 	Face* theList;
 
 	int count;
-
-
 };
 
 #endif

@@ -25,11 +25,6 @@ File name: Cone.cpp
 #define NEG -0.5
 #define POS 0.5
 
-/* *  Static Functions * */
-
-
-/* * * * * * * * * * * * */
-
 Cone::Cone() {
 	faceList = new FaceList;
 }
@@ -42,10 +37,6 @@ void Cone::draw() {
 	double x1, y1, z1;
 	double x2, y2, z2;
 	double x3, y3, z3;
-
-	// if(vertexList==NULL || faceList==NULL){
-	// 	return;
-	// }
 
 	for (int i = 0; i < faceList->getLength(); i++) {
 		Face face = faceList->getFace(i);
@@ -63,9 +54,6 @@ void Cone::draw() {
 
 		glBegin(GL_TRIANGLES); // sets the shapes that openGL draws and determines
                            // the number of vertices that are necessary
-		//setNormal(x1, y1, z1, x2, y2, z2, x3, y3, z3); // makes sure that each 
-                                                   // vertex is correctly 
-                                                   // scaled
 		glNormal3f(face.nx, face.ny, face.nz);
 
 		glVertex3f(x1, y1, z1);  // set the three vertices for the triangle
@@ -126,13 +114,16 @@ void Cone::makeFaceList() {
 		vertex3.y = -0.5f;
 		vertex3.status = true;
 
-		Vector v1(vertex1.x - vertex2.x, vertex1.y - vertex2.y, vertex1.z - vertex2.z);
-		Vector v2(vertex1.x - vertex3.x, vertex1.y - vertex3.y, vertex1.z - vertex3.z);
+		Vector v1(vertex1.x - vertex2.x, vertex1.y - vertex2.y, 
+					vertex1.z - vertex2.z);
+		Vector v2(vertex1.x - vertex3.x, vertex1.y - vertex3.y, 
+					vertex1.z - vertex3.z);
 		Vector v3 = cross(v1, v2);
 		v3.normalize();
 
 		//make bottom faces
-		faceList->addFace(vertex1, vertex2, vertex3, v3.at(0), v3.at(1), v3.at(2));
+		faceList->addFace(vertex1, vertex2, vertex3, v3.at(0), 
+							v3.at(1), v3.at(2));
 		theta += addTheta;
 	}
 
@@ -194,8 +185,8 @@ void Cone::makeFaceList() {
 				Vector vec2(v1.x - v3.x, v1.y - v3.y, v1.z - v3.z);
 				Vector vec3 = cross(vec2, vec1);
 				vec3.normalize();
-				faceList->addFace(v1, v2, v3, vec3.at(0), vec3.at(1), vec3.at(2));
-
+				faceList->addFace(v1, v2, v3, vec3.at(0), 
+									vec3.at(1), vec3.at(2));
 
 				if ((i + 1) < h) {
 					v1.x = v3.x + dX;
@@ -207,25 +198,18 @@ void Cone::makeFaceList() {
 					Vector vec6 = cross(vec4, vec5);
 					vec6.normalize();
 
-					faceList->addFace(v3, v2, v1, vec6.at(0), vec6.at(1), vec6.at(2));
+					faceList->addFace(v3, v2, v1, vec6.at(0), 
+										vec6.at(1), vec6.at(2));
 				}
-
 				v1 = v2;
-
-
 			}
-
 			startV.x = startV.x + udX;
 			startV.y = startV.y + udY;
 			startV.z = startV.z + udZ;
 		}
-
 		startV = endV;
 		theta += addTheta;
 	} 
-
-
-
 }
 
 void Cone::drawNormal() {

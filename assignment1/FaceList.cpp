@@ -22,13 +22,6 @@ File name: FaceList.cpp
 #define POS 0.5
 
 
-/* *  Static Functions * */
-
-
-
-/* * * * * * * * * * * * */
-
-
 FaceList::FaceList()
 {
 	theList = NULL;
@@ -83,3 +76,5 @@ int FaceList::getLength()
 {
 	return count;
 }
+
+

@@ -26,8 +26,6 @@ struct Vert {
 	float znorm;
 };
 
-
-
 class CubeList {
 
 public:
@@ -42,16 +40,11 @@ public:
 
 	int getLength();
 
-
-
-
 protected:
 
 	Vert* theList;
 
 	int count;
-
-
 };
 
 #endif

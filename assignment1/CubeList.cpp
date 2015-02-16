@@ -24,13 +24,6 @@ File name: CubeList.cpp
 #define POS 0.5
 
 
-/* *  Static Functions * */
-
-
-
-/* * * * * * * * * * * * */
-
-
 CubeList::CubeList()
 {
 	theList = NULL;
@@ -58,7 +51,8 @@ void CubeList::makeList(float x_seg, float y_seg)
 
 }
 
-void CubeList::addVert(float x, float y, float z, float isFirst, float xnorm, float ynorm, float znorm)
+void CubeList::addVert(float x, float y, float z, float isFirst, 
+						float xnorm, float ynorm, float znorm)
 {
 	Vert vert;
 
@@ -80,10 +74,7 @@ void CubeList::addVert(float x, float y, float z, float isFirst, float xnorm, fl
 
 Vert CubeList::getVert(int i)
 {
-
 	return theList[i];
-
-
 }
 
 int CubeList::getLength()

@@ -30,9 +30,8 @@ protected:
 
 	CubeList *cubelist;
 
-	void drawFace(float xc, float yc, float zc, float dirx, float diry, float dirz, float norm);
-
-
+	void drawFace(float xc, float yc, float zc, float dirx, 
+					float diry, float dirz, float norm);
 };
 
 #endif
