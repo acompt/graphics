@@ -25,11 +25,13 @@ File name: Cylinder.cpp
 
 Cylinder::Cylinder() {
 	faceList = new FaceList;
+	vertexList = new VertexList;
 }
 
 void Cylinder::draw() {
 
 	faceList->makeList(m_segmentsX, m_segmentsY, 10);
+	vertexList->makeList(m_segmentsX, m_segmentsY);
 	makeFaceList();
 
 	float x1, y1, z1;
@@ -62,19 +64,21 @@ void Cylinder::draw() {
 }
 
 void Cylinder::drawNormal() {
-	Face face;
+	Vertex vertex;
 
-	for (int i = 0; i < faceList->getLength(); i++) {
-		face = faceList->getFace(i);
+	for (int i = 0; i < vertexList->getLength(); i++) {
+		// face = faceList->getFace(i);
+		vertex = vertexList->getVertex(i);
+
 		glBegin(GL_LINES);
-		glVertex3f(face.a.x, face.a.y, face.a.z);
-		glVertex3f(face.a.x + face.nx, face.a.y + face.ny, face.a.z + face.nz);
+		glVertex3f(vertex.x, vertex.y, vertex.z);
+		glVertex3f(vertex.nx, vertex.ny, vertex.nz);
 
-		glVertex3f(face.b.x, face.b.y, face.b.z);
-		glVertex3f(face.b.x + face.nx, face.b.y + face.ny, face.b.z + face.nz);
+		// glVertex3f(face.b.x, face.b.y, face.b.z);
+		// glVertex3f(face.b.x + face.nx, face.b.y + face.ny, face.b.z + face.nz);
 
-		glVertex3f(face.c.x, face.c.y, face.c.z);
-		glVertex3f(face.c.x + face.nx, face.c.y + face.ny, face.c.z + face.nz);
+		// glVertex3f(face.c.x, face.c.y, face.c.z);
+		// glVertex3f(face.c.x + face.nx, face.c.y + face.ny, face.c.z + face.nz);
 
 		glEnd();
 	}
@@ -123,6 +127,9 @@ void Cylinder::makeLid(float theta, float initX, float initY, float initZ,
 		vertex3.z = 0.0f;
 		vertex3.y = -0.5f;
 
+		vertexList->addVertex(vertex1.x, vertex1.y, vertex1.z, vertex1.x, vertex1.y - 1.0f, vertex1.z);
+		vertexList->addVertex(vertex2.x, vertex2.y, vertex2.z, vertex2.x, vertex2.y - 1.0f, vertex2.z);
+		
 		Vector v1(vertex1.x - vertex2.x, vertex1.y - vertex2.y, vertex1.z - vertex2.z);
 		Vector v2(vertex1.x - vertex3.x, vertex1.y - vertex3.y, vertex1.z - vertex3.z);
 		Vector v3 = cross(v1, v2);
@@ -135,6 +142,9 @@ void Cylinder::makeLid(float theta, float initX, float initY, float initZ,
 		vertex2.y = 0.5f;
 		vertex1.y = 0.5f;
 
+		vertexList->addVertex(vertex1.x, vertex1.y, vertex1.z, vertex1.x, vertex1.y + 1.0f, vertex1.z);
+		vertexList->addVertex(vertex2.x, vertex2.y, vertex2.z, vertex2.x, vertex2.y + 1.0f, vertex2.z);
+
 		Vector v5(vertex1.x - vertex2.x, vertex1.y - vertex2.y, vertex1.z - vertex2.z);
 		Vector v4(vertex1.x - vertex3.x, vertex1.y - vertex3.y, vertex1.z - vertex3.z);
 		v3 = cross(v5, v4);
@@ -143,6 +153,8 @@ void Cylinder::makeLid(float theta, float initX, float initY, float initZ,
 		faceList->addFace(vertex1, vertex2, vertex3, -v3.at(0), -v3.at(1), -v3.at(2));
 		theta += addTheta;
 	}
+	vertexList->addVertex(0.0f, -0.5f, 0.0f, 0.0f, -1.5f, 0.0f);
+	vertexList->addVertex(0.0f, 0.5f, 0.0f, 0.0f, 1.5f, 0.0f);
 }
 
 void Cylinder::makeSides(float theta, float initX, float initY, float initZ, 
@@ -185,6 +197,10 @@ void Cylinder::makeSides(float theta, float initX, float initY, float initZ,
 
 			faceList->addFace(vertex4, vertex3, vertex2, v5.at(0), v5.at(1), v5.at(2));
 
+			vertexList->addVertex(vertex1.x, vertex1.y, vertex1.z, vertex1.x * 2.0f, vertex1.y, vertex1.z * 2.0f);
+			if (j == (m_segmentsY-1)) {
+				vertexList->addVertex(vertex4.x, vertex4.y, vertex4.z, vertex4.x * 2.0f, vertex4.y, vertex4.z * 2.0f);
+			}
 			theta += addTheta;
 		} 
 		initY += stackHeight;

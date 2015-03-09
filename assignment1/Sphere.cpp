@@ -32,11 +32,13 @@ static Vertex getVert(double r, double theta, double phi);
 
 Sphere::Sphere() {
 	faceList = new FaceList;
+	vertexList = new VertexList;
 }
 
 void Sphere::draw() {
 
 	faceList->makeList(m_segmentsX, m_segmentsY, 20);
+	vertexList->makeList(m_segmentsX, m_segmentsY);
 	makeFaceList();
 
 	double x1, y1, z1;
@@ -92,15 +94,10 @@ void Sphere::makeFaceList() {
 
 
 	theta += addTheta;
-	//draw bottom
-
 
 	Vertex v1, v2, v3, v4;
 
-
 	for (int j = 0; j < m_segmentsY; j++) {
-
-
 
 		for (int i = 0; i < (this -> m_segmentsX); i++) {
 
@@ -122,6 +119,9 @@ void Sphere::makeFaceList() {
 			faceList->addFace(v1, v4, v3, vec3.at(0), vec3.at(1), vec3.at(2));
 			faceList->addFace(v1, v2, v4, vec5.at(0), vec5.at(1), vec5.at(2));
 
+			vertexList->addVertex(v1.x, v1.y, v1.z, v1.x*2.0f, v1.y*2.0f, v1.z*2.0f);
+			//vertexList->addVertex(v2.x, v2.y, v2.z, v2.x*2.0f, v2.y*2.0f, v2.z*2.0f);
+		
 			theta = theta + addTheta;
 		}
 
@@ -144,20 +144,23 @@ static Vertex getVert(double r, double theta, double phi) {
 }
 
 void Sphere::drawNormal() {
-	Face face;
+	Vertex vertex;
 
-	for (int i = 0; i < faceList->getLength(); i++) {
-		face = faceList->getFace(i);
-		
+	for (int i = 0; i < vertexList->getLength(); i++) {
+		vertex = vertexList->getVertex(i);
+
 		glBegin(GL_LINES);
-		glVertex3f(face.a.x, face.a.y, face.a.z);
-		glVertex3f(face.a.x + face.nx, face.a.y + face.ny, face.a.z + face.nz);
 
-		glVertex3f(face.b.x, face.b.y, face.b.z);
-		glVertex3f(face.b.x + face.nx, face.b.y + face.ny, face.b.z + face.nz);
+		glVertex3f(vertex.x, vertex.y, vertex.z);
+		glVertex3f(vertex.nx, vertex.ny, vertex.nz);
+		// glVertex3f(face.a.x, face.a.y, face.a.z);
+		// glVertex3f(face.a.x + face.nx, face.a.y + face.ny, face.a.z + face.nz);
 
-		glVertex3f(face.c.x, face.c.y, face.c.z);
-		glVertex3f(face.c.x + face.nx, face.c.y + face.ny, face.c.z + face.nz);
+		// glVertex3f(face.b.x, face.b.y, face.b.z);
+		// glVertex3f(face.b.x + face.nx, face.b.y + face.ny, face.b.z + face.nz);
+
+		// glVertex3f(face.c.x, face.c.y, face.c.z);
+		// glVertex3f(face.c.x + face.nx, face.c.y + face.ny, face.c.z + face.nz);
 
 		glEnd();
 	}

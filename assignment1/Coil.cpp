@@ -39,12 +39,15 @@ static double totXSegs;
 
 Coil::Coil() {
 	faceList = new FaceList;
+	vertexList = new VertexList;
 }
 
 void Coil::draw() {
 
 	faceList->makeList(m_segmentsX, m_segmentsY, 20);
+	vertexList->makeList(m_segmentsX, m_segmentsY);
 	makeFaceList();
+	makeVertexList();
 
 	double x1, y1, z1;
 	double x2, y2, z2;
@@ -208,7 +211,31 @@ void Coil::drawNormal() {
 	}
 }
 
+void Coil::makeVertexList() {
 
+	Face face;
+	Vertex v1, v2, v3, vertex;
+	bool found;
+	for (int i=0; i < faceList->getLength(); i++) {
+		face = faceList->getFace(i);
+		v1 = face.a;
+		v2 = face.b;
+		v3 = face.c;
+		found1 = false;
+		found2 = false;
+		found3 = false;
+
+		for(int j = 0; j < vertexList->getLength(); j++) {
+			vertex = vertexList->getVertex(i);
+			if (vertexList->isEqual(v1, vertex))
+				found1 = true;
+			if (vertexList->isEqual(v1, vertex))
+				found2 = true;
+			if (vertexList->isEqual(v1, vertex))
+				found3 = true;
+		}
+	}
+}
 
 
 

@@ -16,6 +16,7 @@ File name: Cone.h
 
 #include "Shape.h"
 #include "FaceList.h"
+#include "VertexList.h"
 
 class Cone : public Shape {
 
@@ -32,6 +33,6 @@ public:
 protected:
 
 	FaceList *faceList;
-
+	VertexList *vertexList;
 };
 #endif

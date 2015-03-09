@@ -15,6 +15,7 @@ File name: Sphere.h
 
 #include "Shape.h"
 #include "FaceList.h"
+#include "VertexList.h"
 
 class Sphere : public Shape {
 
@@ -31,6 +32,7 @@ public:
 protected:
 
 	FaceList *faceList;
+	VertexList *vertexList;
 
 };
 #endif

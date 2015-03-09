@@ -16,6 +16,7 @@ File name: Coil.h
 
 #include "Shape.h"
 #include "FaceList.h"
+#include "VertexList.h"
 
 class Coil : public Shape {
 
@@ -29,9 +30,12 @@ public:
 
 	void makeFaceList();
 
+	void makeVertexList();
+
 protected:
 
 	FaceList *faceList;
+	VertexList *vertexList;
 
 };
 #endif

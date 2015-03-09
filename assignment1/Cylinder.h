@@ -16,6 +16,7 @@ File name: Cylinder.h
 
 #include "Shape.h"
 #include "FaceList.h"
+#include "VertexList.h"
 
 class Cylinder : public Shape {
 
@@ -37,6 +38,7 @@ public:
 protected:
 
 	FaceList *faceList;
+	VertexList *vertexList;
 
 };
 #endif

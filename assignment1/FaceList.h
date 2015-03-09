@@ -12,11 +12,13 @@ File name: FaceList.h
 ****************************************************************************/
 #ifndef FACELIST_H
 #define FACELIST_H
+#include "VertexList.h"
 
-struct Vertex {
-	float x,y,z;
-	float status;
-};
+// struct Vertex {
+// 	float x,y,z;
+// 	float status;
+// 	float nx, ny, nz;
+// };
 
 struct Face {
 	Vertex a,b,c;

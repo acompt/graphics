@@ -13,7 +13,9 @@ File name: FaceList.cpp
 
 #include <GL/glui.h>
 #include "Shape.h"
+#include "VertexList.h"
 #include "FaceList.h"
+
 
 #define edge_length 1
 #define eps 0.00001
