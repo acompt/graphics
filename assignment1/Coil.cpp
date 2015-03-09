@@ -132,21 +132,23 @@ void Coil::makeFaceList() {
 	bCent.x = (0.5 - radius);
 	bCent.y = -0.5 + radius;
 	bCent.z = 0;
-	bCent.status = true;
 
 	eCent.x = (0.5 - radius);
 	eCent.y = 0.5 - radius;
 	eCent.z = 0;
-	eCent.status = true;
 
 	phi = 0.0;
 
 	for (int m = 0; m < this->m_segmentsY; m++ ) {
 
 		v1 = getOutVert(bCent, 0.0, phi);
+		v1.status = true;
 		v2 = getOutVert(bCent, 0.0, phi + addPhi);
+		v2.status = true;
 		v3 = getOutVert(eCent, 0.0, phi);
+		v3.status = true;
 		v4 = getOutVert(eCent, 0.0, phi + addPhi);
+		v4.status = true;
 
 		Vector vec1(v1.x - bCent.x, v1.y - bCent.y, v1.z - bCent.z);
 		Vector vec2(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
@@ -159,7 +161,7 @@ void Coil::makeFaceList() {
 		vec5.normalize();
 
 
-		faceList->addFace(v1, v2, bCent, vec3.at(0), vec3.at(1), vec3.at(2));
+		faceList->addFace(v1, v2, bCent, -vec3.at(0), vec3.at(1), -vec3.at(2));
 		faceList->addFace(v3, eCent, v4, vec5.at(0), vec5.at(1), vec5.at(2));
 
  		phi += addPhi;
@@ -190,7 +192,7 @@ static Vertex getOutVert(Vertex cent, double theta, double phi) {
 
 	toReturn.x = newRad * cos(theta);
 	toReturn.z = newRad * sin(theta);
-	toReturn.status = true;
+	toReturn.status = false;
 
 	return toReturn;
 
@@ -198,14 +200,12 @@ static Vertex getOutVert(Vertex cent, double theta, double phi) {
 
 void Coil::drawNormal() {
 	Vertex vertex;
-	printf("%i\n", vertexList->getLength());
-	printf("%i\n", faceList->getLength());
 	for (int i = 0; i < vertexList->getLength(); i++) {
 		vertex = vertexList->getVertex(i);
 		glBegin(GL_LINES);
 
 		glVertex3f(vertex.x, vertex.y, vertex.z);
-		glVertex3f(vertex.nx, vertex.ny, vertex.nz);
+		glVertex3f(vertex.x + vertex.nx, vertex.y + vertex.ny, vertex.z + vertex.nz);
 		// glVertex3f(face.a.x, face.a.y, face.a.z);
 		// glVertex3f(face.a.x + face.nx, face.a.y + face.ny, face.a.z + face.nz);
 
@@ -235,40 +235,46 @@ void Coil::makeVertexList() {
 		found3 = false;
 
 		for(int j = 0; j < vertexList->getLength(); j++) {
-			vertex = vertexList->getVertex(i);
+			vertex = vertexList->getVertex(j);
 			if ((IN_RANGE(v1.x, vertex.x)) && (IN_RANGE(v1.y, vertex.y)) && (IN_RANGE(v1.z, vertex.z))) {
-				cx = v1.x + face.nx + vertex.x + vertex.nx;
-				cy = v1.y + face.ny + vertex.y + vertex.ny;
-				cz = v1.z + face.nz + vertex.z + vertex.nz;
-				c = vertex.count + 1.0f;
-				found1 = true;
-				vertexList->setVertex(vertex.x, vertex.y, vertex.z, cx, cy, cz, i, c);
+				if(!v1.status) {
+					cx = face.nx + vertex.nx;
+					cy = face.ny + vertex.ny;
+					cz = face.nz + vertex.nz;
+					c = vertex.count + 1.0f;
+					found1 = true;
+					vertexList->setVertex(vertex.x, vertex.y, vertex.z, cx, cy, cz, j, c);
+				}
 			}	
 			if ((IN_RANGE(v2.x, vertex.x)) && (IN_RANGE(v2.y, vertex.y)) && (IN_RANGE(v2.z, vertex.z))){
-				cx = v2.x + face.nx + vertex.x + vertex.nx;
-				cy = v2.y + face.ny + vertex.y + vertex.ny;
-				cz = v2.z + face.nz + vertex.z + vertex.nz;
-				c = vertex.count + 1.0f;
-				found2 = true;
-				vertexList->setVertex(vertex.x, vertex.y, vertex.z, cx, cy, cz, i, c);
+				if(!v2.status) {
+					cx = face.nx + vertex.nx;
+					cy = face.ny + vertex.ny;
+					cz = face.nz + vertex.nz;
+					c = vertex.count + 1.0f;
+					found2 = true;
+					vertexList->setVertex(vertex.x, vertex.y, vertex.z, cx, cy, cz, j, c);
+				}
 			}
 			if ((IN_RANGE(v3.x, vertex.x)) && (IN_RANGE(v3.y, vertex.y)) && (IN_RANGE(v3.z, vertex.z))) {
-				cx = v3.x + face.nx + vertex.x + vertex.nx;
-				cy = v3.y + face.ny + vertex.y + vertex.ny;
-				cz = v3.z + face.nz + vertex.z + vertex.nz;
-				c = vertex.count + 1.0f;
-				found3 = true;
-				vertexList->setVertex(vertex.x, vertex.y, vertex.z, cx, cy, cz, i, c);
+				if (!v3.status) {
+					cx = face.nx + vertex.nx;
+					cy = face.ny + vertex.ny;
+					cz = face.nz + vertex.nz;
+					c = vertex.count + 1.0f;
+					found3 = true;
+					vertexList->setVertex(vertex.x, vertex.y, vertex.z, cx, cy, cz, j, c);
+				}
 			}	
 		}
 		if (!found1) {
-			vertexList->addVertex(v1.x, v1.y, v1.z, v1.x + face.nx, v1.y + face.ny, v1.z + face.nz);
+			vertexList->addVertex(v1.x, v1.y, v1.z, face.nx, face.ny, face.nz);
 		}	
 		if (!found2) {
-			vertexList->addVertex(v2.x, v2.y, v2.z, v2.x + face.nx, v2.y + face.ny, v2.z + face.nz);
+			vertexList->addVertex(v2.x, v2.y, v2.z, face.nx, face.ny, face.nz);
 		}
 		if (!found3) {
-			vertexList->addVertex(v3.x, v3.y, v3.z, v3.x + face.nx, v3.y + face.ny, v3.z + face.nz);
+			vertexList->addVertex(v3.x, v3.y, v3.z, face.nx, face.ny, face.nz);
 		}
 	}
 

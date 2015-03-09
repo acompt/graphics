@@ -61,6 +61,7 @@ void VertexList::addVertex(float x, float y, float z, float nx, float ny, float 
 	vertex.ny = ny;
 	vertex.nz = nz;
 	vertex.count = 1.0f;
+	vertex.status = false;
 
 	theList[count] = vertex;
 
