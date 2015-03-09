@@ -132,10 +132,12 @@ void Coil::makeFaceList() {
 	bCent.x = (0.5 - radius);
 	bCent.y = -0.5 + radius;
 	bCent.z = 0;
+	bCent.status = true;
 
 	eCent.x = (0.5 - radius);
 	eCent.y = 0.5 - radius;
 	eCent.z = 0;
+	eCent.status = true;
 
 	phi = 0.0;
 
@@ -172,6 +174,7 @@ static Vertex getCentVert(double iter, double theta) {
 	toReturn.y = (-0.5 + radius) + ((iter) / totXSegs) * cRise;
 	toReturn.x = (0.5 - radius) * cos(theta);
 	toReturn.z = (0.5 - radius) * sin(theta);
+	toReturn.status = false;
 
 	return toReturn;
 }
@@ -187,6 +190,7 @@ static Vertex getOutVert(Vertex cent, double theta, double phi) {
 
 	toReturn.x = newRad * cos(theta);
 	toReturn.z = newRad * sin(theta);
+	toReturn.status = true;
 
 	return toReturn;
 
@@ -194,8 +198,9 @@ static Vertex getOutVert(Vertex cent, double theta, double phi) {
 
 void Coil::drawNormal() {
 	Vertex vertex;
-
-	for (int i = 0; i < faceList->getLength(); i++) {
+	printf("%i\n", vertexList->getLength());
+	printf("%i\n", faceList->getLength());
+	for (int i = 0; i < vertexList->getLength(); i++) {
 		vertex = vertexList->getVertex(i);
 		glBegin(GL_LINES);
 
@@ -231,46 +236,46 @@ void Coil::makeVertexList() {
 
 		for(int j = 0; j < vertexList->getLength(); j++) {
 			vertex = vertexList->getVertex(i);
-			if (vertexList->isEqual(v1, vertex)) {
-				cx = v1.nx + vertex.nx;
-				cy = v1.ny + vertex.ny;
-				cz = v1.nz + vertex.nz;
-				c = vertex.count++;
+			if ((IN_RANGE(v1.x, vertex.x)) && (IN_RANGE(v1.y, vertex.y)) && (IN_RANGE(v1.z, vertex.z))) {
+				cx = v1.x + face.nx + vertex.x + vertex.nx;
+				cy = v1.y + face.ny + vertex.y + vertex.ny;
+				cz = v1.z + face.nz + vertex.z + vertex.nz;
+				c = vertex.count + 1.0f;
 				found1 = true;
-				vertexList->setVertex(vertex.x, vertex.y, vertex.z, cx, cy, cz, i, c+1.0f);
+				vertexList->setVertex(vertex.x, vertex.y, vertex.z, cx, cy, cz, i, c);
 			}	
-			if (vertexList->isEqual(v2, vertex)){
-				cx = v2.nx + vertex.nx;
-				cy = v2.ny + vertex.ny;
-				cz = v2.nz + vertex.nz;
-				c = vertex.count++;
+			if ((IN_RANGE(v2.x, vertex.x)) && (IN_RANGE(v2.y, vertex.y)) && (IN_RANGE(v2.z, vertex.z))){
+				cx = v2.x + face.nx + vertex.x + vertex.nx;
+				cy = v2.y + face.ny + vertex.y + vertex.ny;
+				cz = v2.z + face.nz + vertex.z + vertex.nz;
+				c = vertex.count + 1.0f;
 				found2 = true;
-				vertexList->setVertex(vertex.x, vertex.y, vertex.z, cx, cy, cz, i, c+1.0f);
+				vertexList->setVertex(vertex.x, vertex.y, vertex.z, cx, cy, cz, i, c);
 			}
-			if (vertexList->isEqual(v3, vertex)) {
-				cx = v3.nx + vertex.nx;
-				cy = v3.ny + vertex.ny;
-				cz = v3.nz + vertex.nz;
-				c = vertex.count++;
+			if ((IN_RANGE(v3.x, vertex.x)) && (IN_RANGE(v3.y, vertex.y)) && (IN_RANGE(v3.z, vertex.z))) {
+				cx = v3.x + face.nx + vertex.x + vertex.nx;
+				cy = v3.y + face.ny + vertex.y + vertex.ny;
+				cz = v3.z + face.nz + vertex.z + vertex.nz;
+				c = vertex.count + 1.0f;
 				found3 = true;
-				vertexList->setVertex(vertex.x, vertex.y, vertex.z, cx, cy, cz, i, c+1.0f);
+				vertexList->setVertex(vertex.x, vertex.y, vertex.z, cx, cy, cz, i, c);
 			}	
-			if (!found1) {
-				vertexList->addVertex(v1.x, v1.y, v1.z, v1.nx, v1.ny, v1.nz);
-			}	
-			if (!found2) {
-				vertexList->addVertex(v2.x, v2.y, v2.z, v2.nx, v2.ny, v2.nz);
-			}
-			if (!found3) {
-				vertexList->addVertex(v3.x, v3.y, v3.z, v3.nx, v3.ny, v3.nz);
-			}
+		}
+		if (!found1) {
+			vertexList->addVertex(v1.x, v1.y, v1.z, v1.x + face.nx, v1.y + face.ny, v1.z + face.nz);
+		}	
+		if (!found2) {
+			vertexList->addVertex(v2.x, v2.y, v2.z, v2.x + face.nx, v2.y + face.ny, v2.z + face.nz);
+		}
+		if (!found3) {
+			vertexList->addVertex(v3.x, v3.y, v3.z, v3.x + face.nx, v3.y + face.ny, v3.z + face.nz);
 		}
 	}
 
 	for (int i = 0; i < vertexList->getLength(); i++) {
-		vertex = vertexList->getVertex(i);
-		c = vertex.count;
-		vertexList->setVertex(vertex.x, vertex.y, vertex.z, (vertex.nx/c), (vertex.ny/c),(vertex.nz/c), i, c);
+		Vertex v = vertexList->getVertex(i);
+		float count = v.count;
+		vertexList->setVertex(v.x, v.y, v.z, (v.nx/count), (v.ny/count), (v.nz/count), i, count);
 	}
 }
 

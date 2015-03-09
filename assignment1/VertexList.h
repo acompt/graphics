@@ -15,7 +15,7 @@ File name: VertexList.h
 
 struct Vertex {
 	float x,y,z;
-	float status;
+	bool status;
 	float nx, ny, nz;
 	float count;
 };

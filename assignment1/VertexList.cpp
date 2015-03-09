@@ -14,6 +14,7 @@ File name: VertexList.cpp
 #include <GL/glui.h>
 #include "Shape.h"
 #include "VertexList.h"
+#include "Algebra.h"
 
 #define edge_length 1
 #define eps 0.00001
@@ -25,7 +26,7 @@ File name: VertexList.cpp
 VertexList::VertexList()
 {
 	theList = NULL;
-	count = 0;
+	//count = 0;
 
 }
 
@@ -38,7 +39,7 @@ void VertexList::makeList(float x_seg, float y_seg)
 	sy = y_seg + 1;
 
 
-	vertices = (((sx * sy) + (sx * 2) + (2))*5);
+	vertices = (((sx * sy) + (sx * 2) + (2))*100);
 
 	if (theList != NULL) {
 		delete[] theList;
@@ -59,6 +60,7 @@ void VertexList::addVertex(float x, float y, float z, float nx, float ny, float 
 	vertex.nx = nx;
 	vertex.ny = ny;
 	vertex.nz = nz;
+	vertex.count = 1.0f;
 
 	theList[count] = vertex;
 
@@ -78,23 +80,20 @@ int VertexList::getLength()
 
 bool VertexList::isEqual(Vertex v1, Vertex v2) 
 {
-	if (v1.x == v2.x && v1.y == v2.y && v1.z == v2.z) {
-		return true;
-	}
-	return false;
+	//printf("%f\n", v1.x);
+	//printf("%f\n", v2.x);
+	(IN_RANGE(v1.x, v2.x)) && (IN_RANGE(v1.y, v2.y)) && (IN_RANGE(v1.z, v2.z));
 }
 
 void VertexList::setVertex(float x, float y, float z, float nx, float ny, float nz, int i, float c) 
 {
-	Vertex vertex;
-	vertex.x = x;
-	vertex.y = y;
-	vertex.z = z;
-	vertex.nx = nx;
-	vertex.ny = ny;
-	vertex.nz = nz;
-	vertex.count = c;
-	theList[i] = vertex;
+	theList[i].x = x;
+	theList[i].y = y;
+	theList[i].z = z;
+	theList[i].nx = nx;
+	theList[i].ny = ny;
+	theList[i].nz = nz;
+	theList[i].count = c;
 }
 
 
