@@ -17,6 +17,7 @@ struct Vertex {
 	float x,y,z;
 	float status;
 	float nx, ny, nz;
+	float count;
 };
 
 class VertexList {
@@ -34,6 +35,8 @@ public:
 	int getLength();
 
 	bool isEqual(Vertex v1, Vertex v2);
+
+	void setVertex(float x, float y, float z, float nx, float ny, float nz, int i, float c);
 
 protected:
 

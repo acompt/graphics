@@ -193,19 +193,22 @@ static Vertex getOutVert(Vertex cent, double theta, double phi) {
 }
 
 void Coil::drawNormal() {
-	Face face;
+	Vertex vertex;
 
 	for (int i = 0; i < faceList->getLength(); i++) {
-		face = faceList->getFace(i);
+		vertex = vertexList->getVertex(i);
 		glBegin(GL_LINES);
-		glVertex3f(face.a.x, face.a.y, face.a.z);
-		glVertex3f(face.a.x + face.nx, face.a.y + face.ny, face.a.z + face.nz);
 
-		glVertex3f(face.b.x, face.b.y, face.b.z);
-		glVertex3f(face.b.x + face.nx, face.b.y + face.ny, face.b.z + face.nz);
+		glVertex3f(vertex.x, vertex.y, vertex.z);
+		glVertex3f(vertex.nx, vertex.ny, vertex.nz);
+		// glVertex3f(face.a.x, face.a.y, face.a.z);
+		// glVertex3f(face.a.x + face.nx, face.a.y + face.ny, face.a.z + face.nz);
 
-		glVertex3f(face.c.x, face.c.y, face.c.z);
-		glVertex3f(face.c.x + face.nx, face.c.y + face.ny, face.c.z + face.nz);
+		// glVertex3f(face.b.x, face.b.y, face.b.z);
+		// glVertex3f(face.b.x + face.nx, face.b.y + face.ny, face.b.z + face.nz);
+
+		// glVertex3f(face.c.x, face.c.y, face.c.z);
+		// glVertex3f(face.c.x + face.nx, face.c.y + face.ny, face.c.z + face.nz);
 
 		glEnd();
 	}
@@ -215,7 +218,8 @@ void Coil::makeVertexList() {
 
 	Face face;
 	Vertex v1, v2, v3, vertex;
-	bool found;
+	bool found1, found2, found3;
+	float cx, cy, cz, c;
 	for (int i=0; i < faceList->getLength(); i++) {
 		face = faceList->getFace(i);
 		v1 = face.a;
@@ -227,13 +231,46 @@ void Coil::makeVertexList() {
 
 		for(int j = 0; j < vertexList->getLength(); j++) {
 			vertex = vertexList->getVertex(i);
-			if (vertexList->isEqual(v1, vertex))
+			if (vertexList->isEqual(v1, vertex)) {
+				cx = v1.nx + vertex.nx;
+				cy = v1.ny + vertex.ny;
+				cz = v1.nz + vertex.nz;
+				c = vertex.count++;
 				found1 = true;
-			if (vertexList->isEqual(v1, vertex))
+				vertexList->setVertex(vertex.x, vertex.y, vertex.z, cx, cy, cz, i, c+1.0f);
+			}	
+			if (vertexList->isEqual(v2, vertex)){
+				cx = v2.nx + vertex.nx;
+				cy = v2.ny + vertex.ny;
+				cz = v2.nz + vertex.nz;
+				c = vertex.count++;
 				found2 = true;
-			if (vertexList->isEqual(v1, vertex))
+				vertexList->setVertex(vertex.x, vertex.y, vertex.z, cx, cy, cz, i, c+1.0f);
+			}
+			if (vertexList->isEqual(v3, vertex)) {
+				cx = v3.nx + vertex.nx;
+				cy = v3.ny + vertex.ny;
+				cz = v3.nz + vertex.nz;
+				c = vertex.count++;
 				found3 = true;
+				vertexList->setVertex(vertex.x, vertex.y, vertex.z, cx, cy, cz, i, c+1.0f);
+			}	
+			if (!found1) {
+				vertexList->addVertex(v1.x, v1.y, v1.z, v1.nx, v1.ny, v1.nz);
+			}	
+			if (!found2) {
+				vertexList->addVertex(v2.x, v2.y, v2.z, v2.nx, v2.ny, v2.nz);
+			}
+			if (!found3) {
+				vertexList->addVertex(v3.x, v3.y, v3.z, v3.nx, v3.ny, v3.nz);
+			}
 		}
+	}
+
+	for (int i = 0; i < vertexList->getLength(); i++) {
+		vertex = vertexList->getVertex(i);
+		c = vertex.count;
+		vertexList->setVertex(vertex.x, vertex.y, vertex.z, (vertex.nx/c), (vertex.ny/c),(vertex.nz/c), i, c);
 	}
 }
 

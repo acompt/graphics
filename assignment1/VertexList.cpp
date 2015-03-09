@@ -78,9 +78,27 @@ int VertexList::getLength()
 
 bool VertexList::isEqual(Vertex v1, Vertex v2) 
 {
-	if (v1.x == v2.x && v1.y == v2.y && v1.z == v3.z) {
+	if (v1.x == v2.x && v1.y == v2.y && v1.z == v2.z) {
 		return true;
 	}
 	return false;
 }
+
+void VertexList::setVertex(float x, float y, float z, float nx, float ny, float nz, int i, float c) 
+{
+	Vertex vertex;
+	vertex.x = x;
+	vertex.y = y;
+	vertex.z = z;
+	vertex.nx = nx;
+	vertex.ny = ny;
+	vertex.nz = nz;
+	vertex.count = c;
+	theList[i] = vertex;
+}
+
+
+
+
+
 
