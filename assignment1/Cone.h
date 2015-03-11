@@ -30,6 +30,8 @@ public:
 
 	void makeFaceList();
 
+	void makeVertexList();
+
 protected:
 
 	FaceList *faceList;
