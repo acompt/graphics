@@ -6,36 +6,58 @@
 #include "Algebra.h"
 
 class Camera {
-public:
-Camera();
-~Camera();
-void Orient(Point& eye, Point& focus, Vector& up);
-void Orient(Point& eye, Vector& look, Vector& up);
-void SetViewAngle (double viewAngle);
-void SetNearPlane (double nearPlane);
-void SetFarPlane (double farPlane);
-void SetScreenSize (int screenWidth, int screenHeight);
 
-Matrix GetProjectionMatrix();
-Matrix GetModelViewMatrix();
+	public:
 
-void RotateV(double angle);
-void RotateU(double angle);
-void RotateW(double angle);
-void Rotate(Point p, Vector axis, double degree);
-void Translate(const Vector &v);
+		Camera();
+		~Camera();
+		void Orient(Point& eye, Point& focus, Vector& up);
+		void Orient(Point& eye, Vector& look, Vector& up);
+		void SetViewAngle (double viewAngle);
+		void SetNearPlane (double nearPlane);
+		void SetFarPlane (double farPlane);
+		void SetScreenSize (int screenWidth, int screenHeight);
 
-Point GetEyePoint();
-Vector GetLookVector();
-Vector GetUpVector();
-double GetViewAngle();
-double GetNearPlane();
-double GetFarPlane();
-int GetScreenWidth();
-int GetScreenHeight();
+		Matrix GetProjectionMatrix();
+		Matrix GetModelViewMatrix();
 
-double GetFilmPlanDepth();
-double GetScreenWidthRatio();
+		void RotateV(double angle);
+		void RotateU(double angle);
+		void RotateW(double angle);
+		void Rotate(Point p, Vector axis, double degree);
+		void Translate(const Vector &v);
+
+		Point GetEyePoint();
+		Vector GetLookVector();
+		Vector GetUpVector();
+		double GetViewAngle();
+		double GetNearPlane();
+		double GetFarPlane();
+		int GetScreenWidth();
+		int GetScreenHeight();
+
+		double GetFilmPlanDepth();
+		double GetScreenWidthRatio();
+
+	private:
+
+		Matrix mvM;
+		Matrix pjM;
+
+		Point eyePoint;
+		Vector lookVector;
+		Vector upVector;
+
+		double viewAngle;
+		double nearPlane;
+		double farPlane;
+
+		int screenWidth;
+		int screenHeight;
+
+		double filmPlanDepth;
+		double screenWidthRatio;
+
 };
 #endif
 

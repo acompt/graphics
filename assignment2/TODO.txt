@@ -2,4 +2,4 @@ TODO:
 
 - Add normals to Cone
 
-- 
+- Double check the member variables that are vectors and points. Are the right things pointers? Why are the arguments all Vector&'s? Make sure the right things are pointers.
