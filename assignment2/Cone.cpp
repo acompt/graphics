@@ -35,7 +35,6 @@ void Cone::draw() {
 	faceList->makeList(m_segmentsX, m_segmentsY, 20);
 	vertexList->makeList(m_segmentsX, m_segmentsY);
 	makeFaceList();
-	makeVertexList();
 
 	double x1, y1, z1;
 	double x2, y2, z2;
@@ -128,12 +127,12 @@ void Cone::makeFaceList() {
 		faceList->addFace(vertex1, vertex2, vertex3, v3.at(0), 
 							v3.at(1), v3.at(2));
 
-	//	vertexList->addVertex(vertex1.x, vertex1.y, vertex1.z, vertex1.x, vertex1.y - 1.0f, vertex1.z);
+		vertexList->addVertex(vertex1.x, vertex1.y, vertex1.z, vertex1.x, vertex1.y - 1.0f, vertex1.z);
 
 		theta += addTheta;
 	}
 	//middle of bottom
-	//vertexList->addVertex(0.0f, -0.5f, 0.0f, 0.0f, -1.5f, 0.0f);
+	vertexList->addVertex(0.0f, -0.5f, 0.0f, 0.0f, -1.5f, 0.0f);
 
 	initX = 0.5f;
 	initZ = 0.0f;
@@ -175,25 +174,17 @@ void Cone::makeFaceList() {
 		udZ = uT_dZ / m_segmentsY;
 
 		bdX = bT_dX / m_segmentsY;
-<<<<<<< HEAD
-		bdZ = bT_dZ / m_segmentsY;	
-=======
 		bdZ = bT_dZ / m_segmentsY;
 
 		
->>>>>>> 211c6ee40b88252b6557e5582c24d5896fcf7356
 
 		for (int h = m_segmentsY; h > 0; h--) {
 
 			v1 = startV;
-			v1.status = false;
 
 			v2.x = v1.x + udX;
 			v2.y = v1.y + udY;
 			v2.z = v1.z + udZ;
-<<<<<<< HEAD
-			v2.status = false;
-=======
 
 			v4 = endV;
 
@@ -213,49 +204,34 @@ void Cone::makeFaceList() {
 
 /*
 			for (int i = 0; i < h; i++) {
->>>>>>> 211c6ee40b88252b6557e5582c24d5896fcf7356
 
-			v4 = endV;
-			v4.status = false;
+				v2.x = v1.x + dX;
+				v2.y = v1.y;
+				v2.z = v1.z + dZ;
 
-			v3.x = v4.x + bdX;
-			v3.y = v4.y + udY;
-			v3.z = v4.z + bdZ;
-			v3.status = false;
+				v3.x = v1.x + udX;
+				v3.y = v1.y + udY;
+				v3.z = v1.z + udZ;
 
-			Vector vec1(v2.x - v4.x, v2.y - v4.y, v2.z - v4.z);
-			Vector vec2(v2.x - v3.x, v2.y - v3.y, v2.z - v3.z);
-			Vector vec3 = cross(vec2, vec1);
-			vec3.normalize();
+				Vector vec1(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
+				Vector vec2(v1.x - v3.x, v1.y - v3.y, v1.z - v3.z);
+				Vector vec3 = cross(vec2, vec1);
+				vec3.normalize();
+				faceList->addFace(v1, v2, v3, vec3.at(0), 
+									vec3.at(1), vec3.at(2));
 
-<<<<<<< HEAD
-			Vector vec6(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
-			Vector vec4(v1.x - v4.x, v1.y - v4.y, v1.z - v4.z);
-			Vector vec5 = cross(vec6, vec4);
-			vec5.normalize();
-=======
 				vertexList->addVertex(v1.x, v1.y, v1.z, v1.x*2.0f, v1.y*2.0f, v1.z*2.0f);
->>>>>>> 211c6ee40b88252b6557e5582c24d5896fcf7356
 
-			faceList->addFace(v1, v2, v4, vec5.at(0), vec5.at(1), vec5.at(2));
-			faceList->addFace(v2, v3, v4, vec3.at(0), vec3.at(1), vec3.at(2));
+				if ((i + 1) < h) {
+					v1.x = v3.x + dX;
+					v1.y = v3.y;
+					v1.z = v3.z + dZ;
 
-			// Vector vec6(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
-			// Vector vec4(v1.x - v4.x, v1.y - v4.y, v1.z - v4.z);
-			// Vector vec5 = cross(vec6, vec4);
-			// vec5.normalize();
+					Vector vec4(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
+					Vector vec5(v1.x - v3.x, v1.y - v3.y, v1.z - v3.z);
+					Vector vec6 = cross(vec4, vec5);
+					vec6.normalize();
 
-<<<<<<< HEAD
-			// faceList->addFace(v2, v1, v3, -vec3.at(0), vec3.at(1), -vec3.at(2));
-			// faceList->addFace(v3, v1, v4, vec3.at(0), vec3.at(1), vec3.at(2));
-
-		//	vertexList->addVertex(v1.x, v1.y, v1.z, v1.x*2.0f, v1.y*2.0f, v1.z*2.0f);
-
-			startV = v2;
-			endV = v3;
-		}
-
-=======
 					faceList->addFace(v3, v2, v1, vec6.at(0), 
 										vec6.at(1), vec6.at(2));
 				}
@@ -268,7 +244,6 @@ void Cone::makeFaceList() {
 
 
 
->>>>>>> 211c6ee40b88252b6557e5582c24d5896fcf7356
 		startV = endV;
 		theta += addTheta;
 	} 
@@ -296,71 +271,6 @@ void Cone::drawNormal() {
 	}
 }
 
-void Cone::makeVertexList() {
-
-	Face face;
-	Vertex v1, v2, v3, vertex;
-	bool found1, found2, found3;
-	float cx, cy, cz, c;
-	for (int i=0; i < faceList->getLength(); i++) {
-		face = faceList->getFace(i);
-		v1 = face.a;
-		v2 = face.b;
-		v3 = face.c;
-		found1 = false;
-		found2 = false;
-		found3 = false;
-
-		for(int j = 0; j < vertexList->getLength(); j++) {
-			vertex = vertexList->getVertex(j);
-			if ((IN_RANGE(v1.x, vertex.x)) && (IN_RANGE(v1.y, vertex.y)) && (IN_RANGE(v1.z, vertex.z))) {
-				if(!v1.status) {
-					cx = face.nx + vertex.nx;
-					cy = face.ny + vertex.ny;
-					cz = face.nz + vertex.nz;
-					c = vertex.count + 1.0f;
-					found1 = true;
-					vertexList->setVertex(vertex.x, vertex.y, vertex.z, cx, cy, cz, j, c);
-				}
-			}	
-			if ((IN_RANGE(v2.x, vertex.x)) && (IN_RANGE(v2.y, vertex.y)) && (IN_RANGE(v2.z, vertex.z))){
-				if(!v2.status) {
-					cx = face.nx + vertex.nx;
-					cy = face.ny + vertex.ny;
-					cz = face.nz + vertex.nz;
-					c = vertex.count + 1.0f;
-					found2 = true;
-					vertexList->setVertex(vertex.x, vertex.y, vertex.z, cx, cy, cz, j, c);
-				}
-			}
-			if ((IN_RANGE(v3.x, vertex.x)) && (IN_RANGE(v3.y, vertex.y)) && (IN_RANGE(v3.z, vertex.z))) {
-				if (!v3.status) {
-					cx = face.nx + vertex.nx;
-					cy = face.ny + vertex.ny;
-					cz = face.nz + vertex.nz;
-					c = vertex.count + 1.0f;
-					found3 = true;
-					vertexList->setVertex(vertex.x, vertex.y, vertex.z, cx, cy, cz, j, c);
-				}
-			}	
-		}
-		if (!found1) {
-			vertexList->addVertex(v1.x, v1.y, v1.z, face.nx, face.ny, face.nz);
-		}	
-		if (!found2) {
-			vertexList->addVertex(v2.x, v2.y, v2.z, face.nx, face.ny, face.nz);
-		}
-		if (!found3) {
-			vertexList->addVertex(v3.x, v3.y, v3.z, face.nx, face.ny, face.nz);
-		}
-	}
-
-	for (int i = 0; i < vertexList->getLength(); i++) {
-		Vertex v = vertexList->getVertex(i);
-		float count = v.count;
-		vertexList->setVertex(v.x, v.y, v.z, (v.nx/count), (v.ny/count), (v.nz/count), i, count);
-	}
-}
 
 
 
