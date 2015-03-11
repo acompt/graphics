@@ -44,11 +44,19 @@ class Camera {
 		Matrix mvM;
 		Matrix pjM;
 
+		Matrix M1, M2, M3, M4;
+
+		Vector u, v, w;
+
 		Point eyePoint;
 		Vector lookVector;
 		Vector upVector;
 
+		// Don't need all three of these
 		double viewAngle;
+		double viewWidthAngle;
+		double viewHeightAngle;
+
 		double nearPlane;
 		double farPlane;
 
