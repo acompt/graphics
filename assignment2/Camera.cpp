@@ -48,39 +48,7 @@ void Camera::Orient(Point& eye, Vector& look, Vector& up) {
 	
 
 
-	double c = (-1) * (this -> nearPlane / this -> farPlane);
-	// The unhinge matrix
-	// TODO: Should we calculate this elsewhere? And store it as member?
-	M1 = Matrix (1, 0, 0, 0,
-				 0, 1, 0, 0,
-				 0, 0, (1 / (1 + c)), ((-1) * (c / (1 + c))),
-				 0, 0, (-1), 0);
-
-	// Scale matrix
-	double m2e11, m2e22, m2e33;
-	m2e11 = 1 / (this->farPlane * tan(viewWidthAngle / 2));
-	m2e22 = 1 / (this->farPlane * tan(viewHeightAngle / 2));
-	m2e33 = 1 / farPlane;
-	M2 = Matrix (m2e11, 0, 0, 0,
-				  0, m2e22, 0, 0,
-				  0, 0, m2e33, 0,
-				  0, 0, 0, 1);
-
-
-	// Rotation matrix
-	M3 = Matrix ( u[0], u[1], u[2], 0,
-					v[0], v[1], v[2], 0,
-					w[0], w[1], w[2], 0,
-					0, 0, 0, 1);
-
-
-	// Translation matrix
-	M4 = Matrix (1, 0, 0, (-1) * eye[0],
-				0, 1, 0, (-1) * eye[1],
-				0, 0, 1, (-1) * eye[2],
-				0, 0, 0, 1);
-
-	mvM = M1 * M2 * M3 * M4;
+	
 
 }
 
@@ -118,8 +86,39 @@ void Camera::SetScreenSize (int screenWidth, int screenHeight) {
 
 Matrix Camera::GetModelViewMatrix() {
 	
+	double c = (-1) * (this -> nearPlane / this -> farPlane);
+	// The unhinge matrix
+	// TODO: Should we calculate this elsewhere? And store it as member?
+	M1 = Matrix (1, 0, 0, 0,
+				 0, 1, 0, 0,
+				 0, 0, (1 / (1 + c)), ((-1) * (c / (1 + c))),
+				 0, 0, (-1), 0);
+
+	// Scale matrix
+	double m2e11, m2e22, m2e33;
+	m2e11 = 1 / (this->farPlane * tan(viewWidthAngle / 2));
+	m2e22 = 1 / (this->farPlane * tan(viewHeightAngle / 2));
+	m2e33 = 1 / farPlane;
+	M2 = Matrix (m2e11, 0, 0, 0,
+				  0, m2e22, 0, 0,
+				  0, 0, m2e33, 0,
+				  0, 0, 0, 1);
 
 
+	// Rotation matrix
+	M3 = Matrix ( u[0], u[1], u[2], 0,
+					v[0], v[1], v[2], 0,
+					w[0], w[1], w[2], 0,
+					0, 0, 0, 1);
+
+
+	// Translation matrix
+	M4 = Matrix (1, 0, 0, (-1) * eye[0],
+				0, 1, 0, (-1) * eye[1],
+				0, 0, 1, (-1) * eye[2],
+				0, 0, 0, 1);
+
+	mvM = M1 * M2 * M3 * M4;
 
 	return mvM;
 }
