@@ -54,38 +54,6 @@ void Camera::Orient(Point& eye, Vector& look, Vector& up) {
 
 Matrix Camera::GetProjectionMatrix() {
 
-
-	return pjM;
-}
-
-
-void Camera::SetViewAngle (double viewAngle) {
-
-	this -> viewAngle = viewAngle;
-
-}
-
-void Camera::SetNearPlane (double nearPlane) {
-
-	this -> nearPlane = nearPlane;
-
-}
-
-void Camera::SetFarPlane (double farPlane) {
-
-	this -> farPlane = farPlane;
-
-}
-
-void Camera::SetScreenSize (int screenWidth, int screenHeight) {
-
-	this -> screenWidth = screenWidth;
-	this -> screenHeight = screenHeight;
-
-}
-
-Matrix Camera::GetModelViewMatrix() {
-	
 	double c = (-1) * (this -> nearPlane / this -> farPlane);
 	// The unhinge matrix
 	// TODO: Should we calculate this elsewhere? And store it as member?
@@ -118,7 +86,41 @@ Matrix Camera::GetModelViewMatrix() {
 				0, 0, 1, (-1) * eye[2],
 				0, 0, 0, 1);
 
-	mvM = M1 * M2 * M3 * M4;
+	pjM = M1 * M2 * M3 * M4;
+
+
+	return pjM;
+}
+
+
+void Camera::SetViewAngle (double viewAngle) {
+
+	this -> viewAngle = viewAngle;
+
+}
+
+void Camera::SetNearPlane (double nearPlane) {
+
+	this -> nearPlane = nearPlane;
+
+}
+
+void Camera::SetFarPlane (double farPlane) {
+
+	this -> farPlane = farPlane;
+
+}
+
+void Camera::SetScreenSize (int screenWidth, int screenHeight) {
+
+	this -> screenWidth = screenWidth;
+	this -> screenHeight = screenHeight;
+
+}
+
+Matrix Camera::GetModelViewMatrix() {
+	
+
 
 	return mvM;
 }
