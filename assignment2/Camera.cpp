@@ -160,7 +160,7 @@ Matrix Camera::GetModelViewMatrix() {
 
 }
 
-void Camera::RotateArbVec(double angle, Vector a) {
+Matrix Camera::RotateArbVec(double angle, Vector a) {
 	
 	Matrix R, M1, M2, M3, M1i, M2i;
 
@@ -170,26 +170,36 @@ void Camera::RotateArbVec(double angle, Vector a) {
 
 	R = M1i * M2i * M3 * M2 * M1;
 
-	// I'm pretty confident that R is right, but have no
-	// idea what to multiply R by. It's not mvM or pjM I don't think
-	mvM = R * pjM;
+	return R;
 }
 
 void Camera::RotateV(double angle) {
 
-	RotateArbVec(angle, v);
+	return; // remove to try using below code
+
+	Matrix R = RotateArbVec(angle, v);
+	w = R*w;
+	u = R*u;
 
 }
 
 void Camera::RotateU(double angle) {
 
-	RotateArbVec(angle, u);
+	return; // remove to try using below code
+
+	Matrix R = RotateArbVec(angle, u);
+	v = R*v;
+	w = R*w;
 
 }
 
 void Camera::RotateW(double angle) {
 
-	RotateArbVec(angle, w);
+	return; // remove to try using below code
+
+	Matrix R = RotateArbVec(angle, w);
+	u = R*u;
+	v = R*v;
 
 }
 
