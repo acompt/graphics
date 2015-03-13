@@ -154,9 +154,9 @@ void Camera::RotateW(double angle) {
 }
 
 void Camera::Translate(const Vector &v) {
-	Matrix R = Matrix (1, 0, 0, v.x,
-				 0, 1, 0, v.y,
-				 0, 0, 1, v.z,
+	Matrix R = Matrix (1, 0, 0, v[0],
+				 0, 1, 0, v[1],
+				 0, 0, 1, v[2],
 				 0, 0, 0, 1);
 	eyePoint = R * eyePoint;
 }
