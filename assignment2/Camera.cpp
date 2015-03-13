@@ -158,9 +158,7 @@ void Camera::Translate(const Vector &v) {
 				 0, 1, 0, v.y,
 				 0, 0, 1, v.z,
 				 0, 0, 0, 1);
-	u = R * u;
-	w = R * w;
-	v = R * v;
+	eyePoint = R * eyePoint;
 }
 
 
