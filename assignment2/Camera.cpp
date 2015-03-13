@@ -154,6 +154,13 @@ void Camera::RotateW(double angle) {
 }
 
 void Camera::Translate(const Vector &v) {
+	Matrix R = Matrix (1, 0, 0, v.x,
+				 0, 1, 0, v.y,
+				 0, 0, 1, v.z,
+				 0, 0, 0, 1);
+	u = R * u;
+	w = R * w;
+	v = R * v;
 }
 
 
