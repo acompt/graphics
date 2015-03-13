@@ -35,6 +35,7 @@ void Camera::Orient(Point& eye, Vector& look, Vector& up) {
 
 	this -> eyePoint = eye;
 	this -> upVector = up;
+	this -> lookVector = look;
 
 
 	// Time to set the u, v, w vectors
@@ -81,9 +82,9 @@ Matrix Camera::GetProjectionMatrix() {
 
 
 	// Translation matrix
-	M4 = Matrix (1, 0, 0, (-1) * eye[0],
-				0, 1, 0, (-1) * eye[1],
-				0, 0, 1, (-1) * eye[2],
+	M4 = Matrix (1, 0, 0, (-1) * eyePoint[0],
+				0, 1, 0, (-1) * eyePoint[1],
+				0, 0, 1, (-1) * eyePoint[2],
 				0, 0, 0, 1);
 
 	pjM = M1 * M2 * M3 * M4;
@@ -126,12 +127,30 @@ Matrix Camera::GetModelViewMatrix() {
 }
 
 void Camera::RotateV(double angle) {
+	Matrix R = Matrix (cos(angle), 0, sin(angle), 0,
+				 0, 1, 0, 0,
+				 -sin(angle), 0, cos(angle), 0,
+				 0, 0, 0, 1);
+
+	v = R * v;
 }
 
 void Camera::RotateU(double angle) {
+	Matrix R = Matrix (1, 0, 0, 0,
+				 0, cos(angle), -sin(angle), 0,
+				 0, sin(angle), cos(angle), 0,
+				 0, 0, 0, 1);
+
+	u = R * u;
 }
 
 void Camera::RotateW(double angle) {
+	Matrix R = Matrix (cos(angle), -sin(angle), 0, 0,
+				 sin(angle), cos(angle), 0, 0,
+				 0, 0, 1, 0,
+				 0, 0, 0, 1);
+
+	w = R * w;
 }
 
 void Camera::Translate(const Vector &v) {
