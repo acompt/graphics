@@ -26,8 +26,9 @@ Camera::~Camera() {
 
 void Camera::Orient(Point& eye, Point& focus, Vector& up) {
 
-
-
+	this -> eyePoint = eye;
+	this -> upVector = up;
+	//IDK WHAT TO DO WITH FOCUS
 }
 
 
@@ -37,7 +38,6 @@ void Camera::Orient(Point& eye, Vector& look, Vector& up) {
 	this -> upVector = up;
 	this -> lookVector = look;
 
-
 	// Time to set the u, v, w vectors
 	w = (-1) * look;
 	w.normalize();
@@ -46,10 +46,6 @@ void Camera::Orient(Point& eye, Vector& look, Vector& up) {
 	u.normalize();
 
 	v = cross(w, u);
-	
-
-
-	
 
 }
 
@@ -60,7 +56,7 @@ Matrix Camera::GetProjectionMatrix() {
 	// TODO: Should we calculate this elsewhere? And store it as member?
 	M1 = Matrix (1, 0, 0, 0,
 				 0, 1, 0, 0,
-				 0, 0, (1 / (1 + c)), ((-1) * (c / (1 + c))),
+				 0, 0, ((-1) / (1 + c)), (c / (1 + c)),
 				 0, 0, (-1), 0);
 
 	// Scale matrix
@@ -74,7 +70,7 @@ Matrix Camera::GetProjectionMatrix() {
 				  0, 0, 0, 1);
 
 
-	// Rotation matrix
+	//Rotation matrix
 	M3 = Matrix ( u[0], u[1], u[2], 0,
 					v[0], v[1], v[2], 0,
 					w[0], w[1], w[2], 0,
@@ -121,8 +117,28 @@ void Camera::SetScreenSize (int screenWidth, int screenHeight) {
 
 Matrix Camera::GetModelViewMatrix() {
 	
+	// Rotation matrix
+	Matrix R = Matrix (u[0], u[1], u[2], 0,
+				 v[0], v[1], v[2], 0,
+				 w[0], w[1], w[2], 0,
+				 0, 0, 0, 1);
 
+	Point Pn = eyePoint + (nearPlane * lookVector);
+	// Translation matrix
+	Matrix T = Matrix (1, 0, 0, (-1) * Pn[0],
+				0, 1, 0, (-1) * Pn[1],
+				0, 0, 1, (-1) * Pn[2],
+				0, 0, 0, 1);
 
+	// Scaling matrix
+	int x = 2/screenWidth;
+	int y = 2/screenHeight;
+	Matrix S = Matrix (x, 0, 0, 0,
+				0, y, 0, 0,
+				0, 0, farPlane, 0,
+				0, 0, 0, 1);
+
+	mvM = R * T;
 	return mvM;
 }
 
