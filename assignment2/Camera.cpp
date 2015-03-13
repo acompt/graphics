@@ -26,9 +26,17 @@ Camera::~Camera() {
 
 void Camera::Orient(Point& eye, Point& focus, Vector& up) {
 
-	this -> eyePoint = eye;
-	this -> upVector = up;
-	//IDK WHAT TO DO WITH FOCUS
+	// Find the look vector by subtracting eye point from
+	// focus point, call other orient function.
+
+	Vector look = Vector(focus[0] - eye[0],
+							focus[1] - eye[1],
+							focus[2] - eye[2]);
+
+	look.normalize();
+
+	this -> Orient(eye, look, up);
+
 }
 
 
@@ -51,40 +59,30 @@ void Camera::Orient(Point& eye, Vector& look, Vector& up) {
 
 Matrix Camera::GetProjectionMatrix() {
 
-	double c = (-1) * (this -> nearPlane / this -> farPlane);
-	// The unhinge matrix
-	// TODO: Should we calculate this elsewhere? And store it as member?
-	M1 = Matrix (1, 0, 0, 0,
-				 0, 1, 0, 0,
-				 0, 0, ((-1) / (1 + c)), (c / (1 + c)),
-				 0, 0, (-1), 0);
+	
+	// Rotation matrix
+	Matrix R = Matrix (u[0], u[1], u[2], 0,
+				 v[0], v[1], v[2], 0,
+				 w[0], w[1], w[2], 0,
+				 0, 0, 0, 1);
 
-	// Scale matrix
-	double m2e11, m2e22, m2e33;
-	m2e11 = 1 / (this->farPlane * tan(viewWidthAngle / 2));
-	m2e22 = 1 / (this->farPlane * tan(viewHeightAngle / 2));
-	m2e33 = 1 / farPlane;
-	M2 = Matrix (m2e11, 0, 0, 0,
-				  0, m2e22, 0, 0,
-				  0, 0, m2e33, 0,
-				  0, 0, 0, 1);
-
-
-	//Rotation matrix
-	M3 = Matrix ( u[0], u[1], u[2], 0,
-					v[0], v[1], v[2], 0,
-					w[0], w[1], w[2], 0,
-					0, 0, 0, 1);
-
-
+	Point Pn = eyePoint + (nearPlane * lookVector);
 	// Translation matrix
-	M4 = Matrix (1, 0, 0, (-1) * eyePoint[0],
-				0, 1, 0, (-1) * eyePoint[1],
-				0, 0, 1, (-1) * eyePoint[2],
+	Matrix T = Matrix (1, 0, 0, (-1) * Pn[0],
+				0, 1, 0, (-1) * Pn[1],
+				0, 0, 1, (-1) * Pn[2],
 				0, 0, 0, 1);
 
-	pjM = M1 * M2 * M3 * M4;
+	// Scaling matrix
+	int x = 2/screenWidth;
+	int y = 2/screenHeight;
+	Matrix S = Matrix (x, 0, 0, 0,
+				0, y, 0, 0,
+				0, 0, farPlane, 0,
+				0, 0, 0, 1);
 
+	
+	//pjM = S;
 
 	return pjM;
 }
@@ -116,30 +114,47 @@ void Camera::SetScreenSize (int screenWidth, int screenHeight) {
 }
 
 Matrix Camera::GetModelViewMatrix() {
-	
-	// Rotation matrix
-	Matrix R = Matrix (u[0], u[1], u[2], 0,
-				 v[0], v[1], v[2], 0,
-				 w[0], w[1], w[2], 0,
-				 0, 0, 0, 1);
 
-	Point Pn = eyePoint + (nearPlane * lookVector);
+		double c = (-1) * (this -> nearPlane / this -> farPlane);
+
+	// The unhinge matrix
+	M1 = Matrix (1, 0, 0, 0,
+				 0, 1, 0, 0,
+				 0, 0, (1 / (1 + c)), (-1) * (c / (1 + c)), // Changed this back
+				 0, 0, (-1), 0);
+
+	// Scale matrix
+	double m2e11, m2e22, m2e33;
+	m2e11 = 1 / (this->farPlane * tan(viewWidthAngle / 2));
+	m2e22 = 1 / (this->farPlane * tan(viewHeightAngle / 2));
+	m2e33 = 1 / farPlane;
+	M2 = Matrix (m2e11, 0, 0, 0,
+				  0, m2e22, 0, 0,
+				  0, 0, m2e33, 0,
+				  0, 0, 0, 1);
+
+
+
+	//Rotation matrix
+	M3 = Matrix ( u[0], u[1], u[2], 0,
+					v[0], v[1], v[2], 0,
+					w[0], w[1], w[2], 0,
+					0, 0, 0, 1);
+
+
+	Point Pn = eyePoint + nearPlane * lookVector;
+
+
 	// Translation matrix
-	Matrix T = Matrix (1, 0, 0, (-1) * Pn[0],
-				0, 1, 0, (-1) * Pn[1],
-				0, 0, 1, (-1) * Pn[2],
+	M4 = Matrix (1, 0, 0, (-1),// * eyePoint[0],
+				0, 1, 0, (-1),// * eyePoint[1],
+				0, 0, 1, (-1),// * eyePoint[2],
 				0, 0, 0, 1);
 
-	// Scaling matrix
-	int x = 2/screenWidth;
-	int y = 2/screenHeight;
-	Matrix S = Matrix (x, 0, 0, 0,
-				0, y, 0, 0,
-				0, 0, farPlane, 0,
-				0, 0, 0, 1);
-
-	mvM = R * T;
+	// M1 and M3 do something! We're on the right track!
+	mvM = M1 /* M2*/ * M3 * M4;
 	return mvM;
+
 }
 
 void Camera::RotateV(double angle) {
