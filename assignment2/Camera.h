@@ -24,6 +24,7 @@ class Camera {
 		void RotateV(double angle);
 		void RotateU(double angle);
 		void RotateW(double angle);
+		void RotateArbVec(double angle, Vector a);
 		void Rotate(Point p, Vector axis, double degree);
 		void Translate(const Vector &v);
 

@@ -1,4 +1,6 @@
 #include "Camera.h"
+#include "stdio.h"
+
 
 Camera::Camera() {
 
@@ -90,7 +92,11 @@ Matrix Camera::GetProjectionMatrix() {
 
 void Camera::SetViewAngle (double viewAngle) {
 
+	// TODO FIX THIS SO THESE TWO THINGS ARE DEPENDENT 
+	// BUT NOT JUST EQUAL
 	this -> viewAngle = viewAngle;
+	this -> viewHeightAngle = viewAngle;
+	this -> viewWidthAngle = viewAngle;
 
 }
 
@@ -115,7 +121,7 @@ void Camera::SetScreenSize (int screenWidth, int screenHeight) {
 
 Matrix Camera::GetModelViewMatrix() {
 
-		double c = (-1) * (this -> nearPlane / this -> farPlane);
+	double c = (-1) * (this -> nearPlane / this -> farPlane);
 
 	// The unhinge matrix
 	M1 = Matrix (1, 0, 0, 0,
@@ -142,46 +148,49 @@ Matrix Camera::GetModelViewMatrix() {
 					0, 0, 0, 1);
 
 
-	Point Pn = eyePoint + nearPlane * lookVector;
-
-
 	// Translation matrix
-	M4 = Matrix (1, 0, 0, (-1),// * eyePoint[0],
-				0, 1, 0, (-1),// * eyePoint[1],
-				0, 0, 1, (-1),// * eyePoint[2],
+	M4 = Matrix (1, 0, 0, (-1) * eyePoint[0],
+				0, 1, 0, (-1) * eyePoint[1],
+				0, 0, 1, (-1) * eyePoint[2],
 				0, 0, 0, 1);
 
 	// M1 and M3 do something! We're on the right track!
-	mvM = M1 /* M2*/ * M3 * M4;
+	mvM = M1 * M2 * M3 * M4;
 	return mvM;
 
 }
 
-void Camera::RotateV(double angle) {
-	Matrix R = Matrix (cos(angle), 0, sin(angle), 0,
-				 0, 1, 0, 0,
-				 -sin(angle), 0, cos(angle), 0,
-				 0, 0, 0, 1);
+void Camera::RotateArbVec(double angle, Vector a) {
+	
+	Matrix R, M1, M2, M3, M1i, M2i;
 
-	v = R * v;
+	M1 = rotY_mat(atan(a[2] / a[0]));
+	M2 = rotZ_mat((-1)*atan(a[1]/sqrt(a[0]*a[0] + a[2]*a[2])));
+	M3 = rotX_mat(angle);
+
+	R = M1i * M2i * M3 * M2 * M1;
+
+	// I'm pretty confident that R is right, but have no
+	// idea what to multiply R by. It's not mvM or pjM I don't think
+	mvM = R * pjM;
+}
+
+void Camera::RotateV(double angle) {
+
+	RotateArbVec(angle, v);
+
 }
 
 void Camera::RotateU(double angle) {
-	Matrix R = Matrix (1, 0, 0, 0,
-				 0, cos(angle), -sin(angle), 0,
-				 0, sin(angle), cos(angle), 0,
-				 0, 0, 0, 1);
 
-	u = R * u;
+	RotateArbVec(angle, u);
+
 }
 
 void Camera::RotateW(double angle) {
-	Matrix R = Matrix (cos(angle), -sin(angle), 0, 0,
-				 sin(angle), cos(angle), 0, 0,
-				 0, 0, 1, 0,
-				 0, 0, 0, 1);
 
-	w = R * w;
+	RotateArbVec(angle, w);
+
 }
 
 void Camera::Translate(const Vector &v) {
