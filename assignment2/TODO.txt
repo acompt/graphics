@@ -6,3 +6,18 @@ TODO:
 
 - Make new function "reset matrices," that resets all the matrices. Maybe like, you manually change anything that a given parameter affects, and then just call reset. How much downside is there to recalculating things?
 
+
+
+WORKING:
+Move eye x, y, z
+Moving the look angle
+clipping planes
+rotate object
+scale object
+
+
+
+NOT WORKING:
+Rotate around u, v, w
+ANGLE NOT WORKING
+ROTATE AROUND A POINT
