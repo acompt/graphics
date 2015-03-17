@@ -122,6 +122,7 @@ Matrix Camera::RotateArbVec(double angle, Vector a) {
 	
 	Matrix R, M1, M2, M3, M1i, M2i;
 
+	angle = angle * (PI / 180);
 	M1 = rotY_mat(atan(a[2] / a[0]));
 	M2 = rotZ_mat((-1)*atan(a[1]/sqrt(a[0]*a[0] + a[2]*a[2])));
 	M3 = rotX_mat(angle);
@@ -136,12 +137,12 @@ Matrix Camera::RotateArbVec(double angle, Vector a) {
 
 void Camera::RotateV(double angle) {
 	//return;
+
 	Matrix R = RotateArbVec(angle, v);
 	//lookVector = R * lookVector;
 	w = R * w;
-	v = R * v;
+	u = R * u;
 	//Orient(eyePoint, lookVector, upVector);
-
 
 }
 
