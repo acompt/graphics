@@ -141,21 +141,24 @@ Matrix Camera::RotateArbVec(double angle, Vector a) {
 void Camera::RotateV(double angle) {
 
 
-	printf("BEFORE:\n");
-	printf("vx: %f, vy: %f, vz: %f\n", v[0], v[1], v[2]);
-	printf("ux: %f, uy: %f, uz: %f\n", u[0], u[1], u[2]);
-	printf("wx: %f, wy: %f, wz:%f.\n", w[0], w[1], w[2]);
+	// printf("BEFORE:\n");
+	// printf("vx: %f, vy: %f, vz: %f\n", v[0], v[1], v[2]);
+	// printf("ux: %f, uy: %f, uz: %f\n", u[0], u[1], u[2]);
+	// printf("wx: %f, wy: %f, wz:%f.\n", w[0], w[1], w[2]);
 
 	Matrix R = RotateArbVec(angle, v);
+angle = angle * (PI / 180);
+	Matrix R2 = Matrix (cos(angle), 0, sin(angle), 0,
+				 0, 1, 0, 0,
+				 -sin(angle), 0, cos(angle), 0,
+				 0, 0, 0, 1);
+	u = R2 * u; // I think this one works
+	w = R2 * w; // <- I think somehow the problem is here
 
-	w = R * w; // <- I think somehow the problem is here
-	u = R * u; // I think this one works
-
-
-	printf("AFTER:\n");
-	printf("vx: %f, vy: %f, vz: %f\n", v[0], v[1], v[2]);
-	printf("ux: %f, uy: %f, uz: %f\n", u[0], u[1], u[2]);
-	printf("wx: %f, wy: %f, wz:%f.\n", w[0], w[1], w[2]);
+	// printf("AFTER:\n");
+	// printf("vx: %f, vy: %f, vz: %f\n", v[0], v[1], v[2]);
+	// printf("ux: %f, uy: %f, uz: %f\n", u[0], u[1], u[2]);
+	// printf("wx: %f, wy: %f, wz:%f.\n", w[0], w[1], w[2]);
 
 
 }
@@ -172,7 +175,7 @@ void Camera::RotateW(double angle) {
 
 	//return; // remove to try using below code
 
-	Matrix R = RotateArbVec(angle, w);
+	Matrix R = RotateArbVec((360 - angle), w);
 	u = R * u;
 	v = R * v;
 

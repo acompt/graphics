@@ -5,7 +5,5 @@ Graphics Assignment 2
 We have not quite finished but asked for an extension.
 Things we have not quite finished:
 	-rotate V
-	-rotate around a point
-	-cone normals
-	-near and far clipping planes
+	-rotate around a point: check
 Everything else should be working
