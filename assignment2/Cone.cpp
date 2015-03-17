@@ -192,54 +192,23 @@ void Cone::makeFaceList() {
 			v3.y = v4.y + udY;
 			v3.z = v4.z + bdZ;
 
+			Vector vec1(v4.x - v1.x, v4.y - v1.y, v4.z - v1.z);
+			Vector vec2(v1.x - v3.x, v1.y - v3.y, v1.z - v3.z);
+			Vector vec3 = cross(vec1, vec2);
+			vec3.normalize();
 
-			faceList->addFace(v2, v1, v3, NULL, NULL, NULL ); //vec3.at(0), vec3.at(1), vec3.at(2));
-			faceList->addFace(v3, v1, v4, NULL, NULL, NULL ); //vec3.at(0), vec3.at(1), vec3.at(2));
+			faceList->addFace(v2, v1, v3, vec3.at(0), vec3.at(1), vec3.at(2));
+			faceList->addFace(v3, v1, v4, vec3.at(0), vec3.at(1), vec3.at(2));
 
-
+			float r = sqrt(v1.x * v1.x + v1.z * v1.z);
+			float nr = r + 1.0f;
+			float nx = (nr * v1.x) / r;
+			float nz = (nr * v1.z) / r;
+			vertexList->addVertex(v1.x, v1.y, v1.z, nx, v1.y + vec3.at(1), nz);
 
 			startV = v2;
 			endV = v3;
 
-
-/*
-			for (int i = 0; i < h; i++) {
-
-				v2.x = v1.x + dX;
-				v2.y = v1.y;
-				v2.z = v1.z + dZ;
-
-				v3.x = v1.x + udX;
-				v3.y = v1.y + udY;
-				v3.z = v1.z + udZ;
-
-				Vector vec1(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
-				Vector vec2(v1.x - v3.x, v1.y - v3.y, v1.z - v3.z);
-				Vector vec3 = cross(vec2, vec1);
-				vec3.normalize();
-				faceList->addFace(v1, v2, v3, vec3.at(0), 
-									vec3.at(1), vec3.at(2));
-
-				vertexList->addVertex(v1.x, v1.y, v1.z, v1.x*2.0f, v1.y*2.0f, v1.z*2.0f);
-
-				if ((i + 1) < h) {
-					v1.x = v3.x + dX;
-					v1.y = v3.y;
-					v1.z = v3.z + dZ;
-
-					Vector vec4(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
-					Vector vec5(v1.x - v3.x, v1.y - v3.y, v1.z - v3.z);
-					Vector vec6 = cross(vec4, vec5);
-					vec6.normalize();
-
-					faceList->addFace(v3, v2, v1, vec6.at(0), 
-										vec6.at(1), vec6.at(2));
-				}
-				v1 = v2;
-			}
-			startV.x = startV.x + udX;
-			startV.y = startV.y + udY;
-			startV.z = startV.z + udZ; */
 		}
 
 
@@ -258,15 +227,6 @@ void Cone::drawNormal() {
 
 		glVertex3f(vertex.x, vertex.y, vertex.z);
 		glVertex3f(vertex.nx, vertex.ny, vertex.nz);
-		// glVertex3f(face.a.x, face.a.y, face.a.z);
-		// glVertex3f(face.a.x + face.nx, face.a.y + face.ny, face.a.z + face.nz);
-
-		// glVertex3f(face.b.x, face.b.y, face.b.z);
-		// glVertex3f(face.b.x + face.nx, face.b.y + face.ny, face.b.z + face.nz);
-
-		// glVertex3f(face.c.x, face.c.y, face.c.z);
-		// glVertex3f(face.c.x + face.nx, face.c.y + face.ny, face.c.z + face.nz);
-
 		glEnd();
 	}
 }
