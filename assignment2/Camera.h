@@ -55,7 +55,6 @@ class Camera {
 
 		// Don't need all three of these
 		double viewAngle;
-		double viewWidthAngle;
 		double viewHeightAngle;
 
 		double nearPlane;
