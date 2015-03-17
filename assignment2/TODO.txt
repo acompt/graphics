@@ -18,6 +18,6 @@ scale object
 
 
 NOT WORKING:
-Rotate around u, v, w
-ANGLE NOT WORKING
+Rotate around u, v, w - FINISHED
+ANGLE NOT WORKING - FINISHED
 ROTATE AROUND A POINT

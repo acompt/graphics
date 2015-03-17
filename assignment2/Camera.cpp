@@ -68,7 +68,7 @@ Matrix Camera::GetProjectionMatrix() {
 
 
 void Camera::SetViewAngle (double viewAngle) {
-
+	viewAngle = viewAngle * (PI / 180);
 	// TODO FIX THIS SO THESE TWO THINGS ARE DEPENDENT 
 	// BUT NOT JUST EQUAL
 	this -> viewAngle = viewAngle;
