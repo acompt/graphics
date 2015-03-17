@@ -175,7 +175,16 @@ void Camera::Translate(const Vector &v) {
 
 
 void Camera::Rotate(Point p, Vector axis, double degrees) {
+	Matrix T = Matrix (1, 0, 0, -p[0],
+					 0, 1, 0, -p[1],
+					 0, 0, 1, -p[2],
+					 0, 0, 0, 1);
 
+	Matrix R = RotateArbVec(degrees, axis);
+
+	v = invert(T) * R * T * v;
+	u = invert(T) * R * T * u;
+	w = invert(T) * R * T * w;
 
 }
 
