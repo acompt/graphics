@@ -68,11 +68,12 @@ Matrix Camera::GetProjectionMatrix() {
 
 
 void Camera::SetViewAngle (double viewAngle) {
+
+	screenWidthRatio = 0.85;
 	viewAngle = viewAngle * (PI / 180);
-	// TODO FIX THIS SO THESE TWO THINGS ARE DEPENDENT 
-	// BUT NOT JUST EQUAL
+
 	this -> viewAngle = viewAngle;
-	this -> viewHeightAngle = viewAngle;
+	this -> viewHeightAngle = screenWidthRatio * viewAngle;
 
 }
 
