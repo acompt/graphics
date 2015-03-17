@@ -54,7 +54,7 @@ Matrix Camera::GetProjectionMatrix() {
 
 	// Scale matrix
 	double m2e11, m2e22, m2e33;
-	m2e11 = 1 / (this->farPlane * tan(viewWidthAngle / 2));
+	m2e11 = 1 / (this->farPlane * tan(viewAngle / 2));
 	m2e22 = 1 / (this->farPlane * tan(viewHeightAngle / 2));
 	m2e33 = 1 / farPlane;
 	M2 = Matrix (m2e11, 0, 0, 0,
@@ -73,7 +73,6 @@ void Camera::SetViewAngle (double viewAngle) {
 	// BUT NOT JUST EQUAL
 	this -> viewAngle = viewAngle;
 	this -> viewHeightAngle = viewAngle;
-	this -> viewWidthAngle = viewAngle;
 
 }
 
@@ -149,8 +148,6 @@ void Camera::RotateV(double angle) {
 }
 
 void Camera::RotateU(double angle) {
-
-	//return; // remove to try using below code
 
 	Matrix R = RotateArbVec(angle, u);
 	v = R*v;
