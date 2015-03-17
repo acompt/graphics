@@ -120,17 +120,24 @@ Matrix Camera::GetModelViewMatrix() {
 
 Matrix Camera::RotateArbVec(double angle, Vector a) {
 	
-	Matrix R, M1, M2, M3, M1i, M2i;
+	Matrix R, N1, N2, N3, N1i, N2i, T, Ti;
 
 	angle = angle * (PI / 180);
 	M1 = rotY_mat(atan(a[2] / a[0]));
 	M2 = rotZ_mat((-1)*atan(a[1]/sqrt(a[0]*a[0] + a[2]*a[2])));
 	M3 = rotX_mat(angle);
+	N1 = rotY_mat(atan(a[2] / a[0]));
+	N2 = rotZ_mat((-1)*atan(a[1]/sqrt(a[0]*a[0] + a[2]*a[2])));
+	N3 = rotX_mat(angle);
 
-	M1i = inv_rotY_mat(atan(a[2] / a[0]));
-	M2i = inv_rotZ_mat((-1)*atan(a[1]/sqrt(a[0]*a[0] + a[2]*a[2])));
+	N1i = inv_rotY_mat(atan(a[2] / a[0]));
+	N2i = inv_rotZ_mat((-1)*atan(a[1]/sqrt(a[0]*a[0] + a[2]*a[2])));
 
-	R = M1i * M2i * M3 * M2 * M1;
+	T = trans_mat(Vector(eyePoint[0], eyePoint[1], eyePoint[2]));
+	Ti = inv_trans_mat(Vector(eyePoint[0], eyePoint[1], eyePoint[2]));
+
+
+	R = Ti* N1i * N2i * N3 * N2 * N1 * T;
 
 	return R;
 }
@@ -140,6 +147,7 @@ void Camera::RotateV(double angle) {
 
 	Matrix R = RotateArbVec(angle, v);
 	//lookVector = R * lookVector;
+
 	w = R * w;
 	u = R * u;
 	//Orient(eyePoint, lookVector, upVector);
