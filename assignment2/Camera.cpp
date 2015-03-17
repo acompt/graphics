@@ -49,7 +49,7 @@ Matrix Camera::GetProjectionMatrix() {
 	// The unhinge matrix
 	M1 = Matrix (1, 0, 0, 0,
 				 0, 1, 0, 0,
-				 0, 0, (1 / (1 + c)), (-1) * (c / (1 + c)), // Changed this back
+				 0, 0, (-1 / (1 + c)), (c / (1 + c)), // Changed this back
 				 0, 0, (-1), 0);
 
 	// Scale matrix
