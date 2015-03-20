@@ -116,63 +116,55 @@ Matrix Camera::GetModelViewMatrix() {
 
 }
 
-Matrix Camera::RotateArbVec(double angle, Vector a) {
+// Matrix Camera::RotateArbVec(double angle, Vector a) {
 	
-	Matrix R, N1, N2, N3, N1i, N2i;
+// 	Matrix R, N1, N2, N3, N1i, N2i;
 
-	angle = angle * (PI / 180);
-	N1 = rotY_mat(atan(a[2] / a[0]));
-	N2 = rotZ_mat((-1)*atan(a[1]/sqrt(a[0]*a[0] + a[2]*a[2])));
-	N3 = rotX_mat(angle);
+// 	angle = angle * (PI / 180);
+// 	N1 = rotY_mat(atan(a[2] / a[0]));
+// 	N2 = rotZ_mat((-1)*atan(a[1]/sqrt(a[0]*a[0] + a[2]*a[2])));
+// 	N3 = rotX_mat(angle);
 
-	N1i = inv_rotY_mat(atan(a[2] / a[0]));
-	N2i = inv_rotZ_mat((-1)*atan(a[1]/sqrt(a[0]*a[0] + a[2]*a[2])));
+// 	N1i = inv_rotY_mat(atan(a[2] / a[0]));
+// 	N2i = inv_rotZ_mat((-1)*atan(a[1]/sqrt(a[0]*a[0] + a[2]*a[2])));
 
 
-	R = N1i * N2i * N3 * N2 * N1;
+// 	R = N1i * N2i * N3 * N2 * N1;
 
-	return R;
-}
+// 	return R;
+// }
 
-Matrix Camera::RotateWforV(double angle, Vector a) {
+// Matrix Camera::RotateWforV(double angle, Vector a) {
 
-	Matrix R, N1, N2, N3, N1i, N2i;
+// 	Matrix R, N1, N2, N3, N1i, N2i;
 	
 
-	angle = angle * (PI / 180);
+// 	angle = angle * (PI / 180);
 
-	double rad1 = (-1)*atan(a[1] / a[0]);
-	double rad2 = (-1)*atan(sqrt(a[0]*a[0] + a[1]*a[1]) / a[2]);
+// 	double rad1 = (-1)*atan(a[1] / a[0]);
+// 	double rad2 = (-1)*atan(sqrt(a[0]*a[0] + a[1]*a[1]) / a[2]);
 
-	N1 = rotZ_mat(rad1);
-	N2 = rotY_mat(rad2);
+// 	N1 = rotZ_mat(rad1);
+// 	N2 = rotY_mat(rad2);
 
-	N3 = rotZ_mat(angle);
+// 	N3 = rotZ_mat(angle);
 
-	N1i = inv_rotZ_mat(rad1);
-	N2i = inv_rotY_mat(rad2);
+// 	N1i = inv_rotZ_mat(rad1);
+// 	N2i = inv_rotY_mat(rad2);
 
 
-	R = N1i * N2i * N3 * N2 * N1;
+// 	R = N1i * N2i * N3 * N2 * N1;
 
-	return R;
+// 	return R;
 
-}
+// }
 
 void Camera::RotateV(double angle) {
 
-
-	// printf("BEFORE:\n");
-	// printf("vx: %f, vy: %f, vz: %f\n", v[0], v[1], v[2]);
-	// printf("ux: %f, uy: %f, uz: %f\n", u[0], u[1], u[2]);
-	// printf("wx: %f, wy: %f, wz:%f.\n", w[0], w[1], w[2]);
-
-	//Matrix R = RotateArbVec(angle, v);
-	Matrix R1 = RotateWforV(angle, v);
-	Matrix R2 = RotateWforV((-1)*angle, v);
-
-	w = R2 * w; // <- I think somehow the problem is here
-	u = R2 * u; // I think this one works
+	angle = angle * (PI / 180);
+	Matrix R = rot_mat(v, angle);
+	w = R * w; // <- I think somehow the problem is here
+	u = R * u; // I think this one works
 
 
 
@@ -180,7 +172,9 @@ void Camera::RotateV(double angle) {
 
 void Camera::RotateU(double angle) {
 
-	Matrix R = RotateArbVec(angle, u);
+	angle = angle * (PI / 180);
+	Matrix R = rot_mat(u, angle);
+	//Matrix R = RotateArbVec(angle, u);
 	v = R*v;
 	w = R*w;
 
@@ -193,13 +187,13 @@ void Camera::RotateU(double angle) {
 void Camera::RotateW(double angle) {
 
 	//return; // remove to try using below code
-
-	Matrix R = RotateArbVec(angle, w);
+	angle = angle * (PI / -180);
+	Matrix R = rot_mat(w, angle);
 	u = R * u;
 	v = R * v;
+	//w = R * w;
 
 	upVector = R * upVector;
-
 
 }
 
@@ -213,8 +207,11 @@ void Camera::Translate(const Vector &v) {
 
 
 void Camera::Rotate(Point p, Vector axis, double degrees) {
-
-
+	degrees = degrees * (PI / 180);
+	Matrix R = rot_mat(p, axis, degrees);
+	u = R * u;
+	v = R * v;
+	w = R * w;
 }
 
 
