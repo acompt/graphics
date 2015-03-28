@@ -18,6 +18,11 @@
 
 using namespace std;
 
+/* STATIC FUNCTIONS */
+void static drawNode(SceneNode* node);
+static int ct =0;
+
+
 /** These are the live variables passed into GLUI ***/
 int  wireframe = 0;
 int  fillObj = 1;
@@ -65,6 +70,7 @@ void callback_load(int id) {
 	parser = new SceneParser (filenamePath);
 
 	bool success = parser->parse();
+
 	cout << "success? " << success << endl;
 	if (success == false) {
 		delete parser;
@@ -237,6 +243,28 @@ void applyMaterial(const SceneMaterial &material)
 }
 
 
+
+
+void static drawNode(SceneNode* node){
+
+	if (node == NULL) {
+		return;
+	}
+
+	printf("I am node number %d.\n", ct++);
+
+	int size = node->children.size();
+
+
+	for(int i=0; i < size; i++){
+   		drawNode(node->children[i]);
+	}
+
+
+}
+
+
+
 /***************************************** myGlutDisplay() *****************/
 
 void myGlutDisplay(void)
@@ -291,6 +319,22 @@ void myGlutDisplay(void)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		//TODO: draw wireframe of the scene...
 		// note that you don't need to applyMaterial, just draw the geometry
+
+
+
+		//drawNode(root);
+
+
+
+
+
+
+
+
+
+
+
+
 	}
 
     glDisable(GL_COLOR_MATERIAL);
