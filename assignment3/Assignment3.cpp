@@ -9,9 +9,12 @@
 #include "Cube.h"
 #include "Cylinder.h"
 #include "Cone.h"
+#include "Coil.h"
 #include "Sphere.h"
 #include "SceneParser.h"
 #include "Camera.h"
+#include "Algebra.h"
+
 
 using namespace std;
 
@@ -250,7 +253,12 @@ void myGlutDisplay(void)
 	Matrix projection = camera->GetProjectionMatrix();
 	glLoadMatrixd(projection.unpack());
 
-	camera->Orient(Point(eyeX, eyeY, eyeZ), Vector(lookX, lookY, lookZ), Vector(0, 1, 0));
+
+	// Point theP = Point(eyeX, eyeY, eyeZ);
+	// Vector lVec = Vector(lookX, lookY, lookZ);
+	// Vector uVec = Vector(0, 1, 0);
+	
+	// camera->Orient(theP, lVec, uVec);
 	camera->RotateV(camRotV);
 	camera->RotateU(camRotU);
 	camera->RotateW(camRotW);
