@@ -19,7 +19,7 @@
 using namespace std;
 
 /* STATIC FUNCTIONS */
-void static drawNode(SceneNode* node);
+void static drawNode(SceneNode* node, bool setMaterial);
 static int ct =0;
 
 
@@ -245,7 +245,7 @@ void applyMaterial(const SceneMaterial &material)
 
 
 
-void static drawNode(SceneNode* node){
+void static drawNode(SceneNode* node, bool setMaterial){
 
 	if (node == NULL) {
 		return;
@@ -295,8 +295,12 @@ void static drawNode(SceneNode* node){
 
 	int primitives = node->primitives.size();
 	for(int i = 0; i < primitives; i++) {
-		
+		if (setMaterial) {
+			applyMaterial(node->primitives[i]->material);
+		}
+
 		renderShape(node->primitives[i]->type);
+
 		//also has meshfile and material????????????????
 	
 	}
@@ -304,7 +308,7 @@ void static drawNode(SceneNode* node){
 	int size = node->children.size();
 
 	for(int i=0; i < size; i++){
-   		drawNode(node->children[i]);
+   		drawNode(node->children[i], setMaterial);
 	}
 
 	glPopMatrix();
@@ -368,7 +372,7 @@ void myGlutDisplay(void)
 		//TODO: draw wireframe of the scene...
 		// note that you don't need to applyMaterial, just draw the geometry
 
-		//drawNode(root);
+		drawNode(root, false);
 
 	}
 
@@ -387,9 +391,7 @@ void myGlutDisplay(void)
 		//TODO: render the scene...
 		// note that you should always applyMaterial first, then draw the geometry
 
-		//APPLY MATERIAL
-
-		//drawNode(root);
+		drawNode(root, true);
 	}
 	glDisable(GL_LIGHTING);
 	

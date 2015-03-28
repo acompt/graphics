@@ -10,11 +10,14 @@ Camera::~Camera() {
 
 void Camera::Reset() {
 	//default position????
-	SetViewAngle(10);
-	// Vector* vec = new Vector(0, 0 ,0);
-	// Orient()
+	SetViewAngle(32);
+	Point theP = Point(0, 0, 0);
+	Vector lVec = Vector(0, 0, 0);
+	Vector uVec = Vector(0, 1, 0);
+	Orient(theP, lVec, uVec);
+
 	SetNearPlane(10);
-	SetFarPlane(50);
+	SetFarPlane(500);
 }
 
 void Camera::Orient(Point& eye, Point& focus, Vector& up) {
