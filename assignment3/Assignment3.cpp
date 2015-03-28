@@ -253,40 +253,54 @@ void static drawNode(SceneNode* node){
 
 	printf("I am node number %d.\n", ct++);
 
+
+	glPushMatrix();
+
 	int transforms = node->transformations.size();
 	for(int i = 0; i < transforms; i++) {
 
-		glMatrixMode(GL_MODELVIEW);		
+		TransformationType type = node->transformations[i].type;
+
+		if (type == TRANSFORMATION_TRANSLATE){
+
+			Vector v = node->transformations[i].translate;
+
+			glTranslatef(v[0], v[1], v[2]);
+
+
+		} else if (type == TRANSFORMATION_SCALE) {
+
+			Vector v = node->transformations[i].scale;
+
+			glScalef(v[0], v[1], v[2]);
+
+
+		} else if (type == TRANSFORMATION_ROTATE) {
+
+			Vector v = node->transformations[i].rotate;
+			float angle = node->transformations[i].angle;
+
+			glRotatef(angle, v[0], v[1], v[2]);
+
+			
+		} else if (type == TRANSFORMATION_MATRIX) {
+
+			Matrix toMult = = node->transformations[i].matrix;
+
+			glMultMatrixf(projection.unpack());
+
+			
+		}
+
+
+		
 
 	}
 
 	int primitives = node->primitives.size();
 	for(int i = 0; i < primitives; i++) {
 		
-		if (node->primitives[i] == SHAPE_CYLINDER) {
-			cylinder->draw();
-		}
-		else if (node->primitives[i] == SHAPE_CONE) {
-			cone->draw();
-		}
-		else if (node->primitives[i] == SHAPE_CUBE) {
-			cube->draw();
-		}
-		else if (node->primitives[i] == SHAPE_SPHERE) {
-			sphere->draw();
-		}
-		else if (node->primitives[i] == SHAPE_SPECIAL1) {
-			coil->draw();
-		}
-		else if (node->primitives[i] == SHAPE_SPECIAL2) {
-			coil->draw();
-		}
-		else if (node->primitives[i] == SHAPE_SPECIAL3) {
-			coil->draw();
-		}
-		else if (node->primitives[i] == SHAPE_MESH) {
-			//coil->draw();
-		}
+		renderShape(node->primitives[i]);
 	
 	}
 
@@ -295,6 +309,8 @@ void static drawNode(SceneNode* node){
 	for(int i=0; i < size; i++){
    		drawNode(node->children[i]);
 	}
+
+	glPopMatrix()
 
 
 }
