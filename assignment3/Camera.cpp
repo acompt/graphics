@@ -16,7 +16,7 @@ void Camera::Reset() {
 	Vector uVec = Vector(0, 1, 0);
 	Orient(theP, lVec, uVec);
 
-	SetNearPlane(10);
+	SetNearPlane(1);
 	SetFarPlane(500);
 }
 

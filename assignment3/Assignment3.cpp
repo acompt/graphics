@@ -280,6 +280,8 @@ void static drawNode(SceneNode* node, bool setMaterial){
 			Vector v = node->transformations[i]->rotate;
 			float angle = node->transformations[i]->angle;
 
+			angle = angle * (PI / 180);
+
 			glRotatef(angle, v[0], v[1], v[2]);
 
 			
