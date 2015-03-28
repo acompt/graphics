@@ -254,11 +254,11 @@ void myGlutDisplay(void)
 	glLoadMatrixd(projection.unpack());
 
 
-	// Point theP = Point(eyeX, eyeY, eyeZ);
-	// Vector lVec = Vector(lookX, lookY, lookZ);
-	// Vector uVec = Vector(0, 1, 0);
-	
-	// camera->Orient(theP, lVec, uVec);
+	Point theP = Point(eyeX, eyeY, eyeZ);
+	Vector lVec = Vector(lookX, lookY, lookZ);
+	Vector uVec = Vector(0, 1, 0);
+
+	camera->Orient(theP, lVec, uVec);
 	camera->RotateV(camRotV);
 	camera->RotateU(camRotU);
 	camera->RotateW(camRotW);
@@ -333,6 +333,7 @@ void onExit()
 
 int main(int argc, char* argv[])
 {
+
 	atexit(onExit);
 
 	/****************************************/
@@ -351,7 +352,6 @@ int main(int argc, char* argv[])
 	glShadeModel (GL_SMOOTH);
 
 	glEnable(GL_DEPTH_TEST);
-
 	// Specular reflections will be off without this, since OpenGL calculates
 	// specular highlights using an infinitely far away camera by default, not
 	// the actual location of the camera
@@ -374,7 +374,8 @@ int main(int argc, char* argv[])
 	filenameTextField = new GLUI_EditText( glui, "Filename:", filenamePath);
 	filenameTextField->set_w(300);
 	glui->add_button("Load", 0, callback_load);
-	
+
+
 	GLUI_Panel *camera_panel = glui->add_panel("Camera");
 	(new GLUI_Spinner(camera_panel, "RotateV:", &camRotV))
 		->set_int_limits(-179, 179);
