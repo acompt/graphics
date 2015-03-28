@@ -280,11 +280,16 @@ void static drawNode(SceneNode* node, bool setMaterial){
 			Vector v = node->transformations[i]->rotate;
 			float angle = node->transformations[i]->angle;
 
-			angle = angle * (PI / 180);
+			//angle = angle * (PI / 180);
 
-			glRotatef(angle, v[0], v[1], v[2]);
+			//glRotatef(angle, v[0], v[1], v[2]);
 
 			
+			Matrix toMult = rot_mat(v, angle);
+
+			glMultMatrixd(toMult.unpack());
+			
+
 		} else if (type == TRANSFORMATION_MATRIX) {
 
 			Matrix toMult = node->transformations[i]->matrix;
