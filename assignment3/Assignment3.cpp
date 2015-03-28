@@ -253,8 +253,44 @@ void static drawNode(SceneNode* node){
 
 	printf("I am node number %d.\n", ct++);
 
-	int size = node->children.size();
+	int transforms = node->transformations.size();
+	for(int i = 0; i < transforms; i++) {
 
+		glMatrixMode(GL_MODELVIEW);		
+
+	}
+
+	int primitives = node->primitives.size();
+	for(int i = 0; i < primitives; i++) {
+		
+		if (node->primitives[i] == SHAPE_CYLINDER) {
+			cylinder->draw();
+		}
+		else if (node->primitives[i] == SHAPE_CONE) {
+			cone->draw();
+		}
+		else if (node->primitives[i] == SHAPE_CUBE) {
+			cube->draw();
+		}
+		else if (node->primitives[i] == SHAPE_SPHERE) {
+			sphere->draw();
+		}
+		else if (node->primitives[i] == SHAPE_SPECIAL1) {
+			coil->draw();
+		}
+		else if (node->primitives[i] == SHAPE_SPECIAL2) {
+			coil->draw();
+		}
+		else if (node->primitives[i] == SHAPE_SPECIAL3) {
+			coil->draw();
+		}
+		else if (node->primitives[i] == SHAPE_MESH) {
+			//coil->draw();
+		}
+	
+	}
+
+	int size = node->children.size();
 
 	for(int i=0; i < size; i++){
    		drawNode(node->children[i]);
@@ -320,20 +356,7 @@ void myGlutDisplay(void)
 		//TODO: draw wireframe of the scene...
 		// note that you don't need to applyMaterial, just draw the geometry
 
-
-
-		//drawNode(root);
-
-
-
-
-
-
-
-
-
-
-
+		drawNode(root);
 
 	}
 
@@ -351,6 +374,10 @@ void myGlutDisplay(void)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		//TODO: render the scene...
 		// note that you should always applyMaterial first, then draw the geometry
+
+		//APPLY MATERIAL
+
+		drawNode(root);
 	}
 	glDisable(GL_LIGHTING);
 	
