@@ -1,0 +1,6 @@
+To do for assignment 3 (also double check assignment)
+
+1. fix lighting
+2. get robot to work
+3. maybe make camera reset better
+4. make xml file
