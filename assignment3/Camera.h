@@ -11,7 +11,7 @@ class Camera {
 
 		Camera();
 		~Camera();
-		void Reset() {};
+		void Reset();
 		void Orient(Point& eye, Point& focus, Vector& up);
 		void Orient(Point& eye, Vector& look, Vector& up);
 		void SetViewAngle (double viewAngle);

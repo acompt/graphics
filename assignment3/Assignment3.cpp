@@ -368,7 +368,7 @@ void myGlutDisplay(void)
 		//TODO: draw wireframe of the scene...
 		// note that you don't need to applyMaterial, just draw the geometry
 
-		drawNode(root);
+		//drawNode(root);
 
 	}
 
@@ -389,7 +389,7 @@ void myGlutDisplay(void)
 
 		//APPLY MATERIAL
 
-		drawNode(root);
+		//drawNode(root);
 	}
 	glDisable(GL_LIGHTING);
 	

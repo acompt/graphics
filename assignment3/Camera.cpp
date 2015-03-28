@@ -8,6 +8,15 @@ Camera::Camera() {
 Camera::~Camera() {
 }
 
+void Camera::Reset() {
+	//default position????
+	SetViewAngle(10);
+	// Vector* vec = new Vector(0, 0 ,0);
+	// Orient()
+	SetNearPlane(10);
+	SetFarPlane(50);
+}
+
 void Camera::Orient(Point& eye, Point& focus, Vector& up) {
 
 	Vector look = Vector(focus[0] - eye[0],
