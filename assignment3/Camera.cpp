@@ -10,7 +10,7 @@ Camera::~Camera() {
 
 void Camera::Reset() {
 	//default position????
-	SetViewAngle(32);
+	SetViewAngle(3200);
 	Point theP = Point(0, 0, 0);
 	Vector lVec = Vector(0, 0, 0);
 	Vector uVec = Vector(0, 1, 0);
@@ -79,7 +79,9 @@ void Camera::SetViewAngle (double viewAngle) {
 	viewAngle = viewAngle * (PI / 180);
 
 	this -> viewAngle = viewAngle;
-	this -> viewHeightAngle = 0.85 * viewAngle;
+	this -> viewHeightAngle = viewAngle;
+	this -> filmPlanDepth = -1.0 / tan((viewAngle*RAD) / 2.0);
+	//this -> filmPlanDepth = -1.0 / tan((viewAngle) / 2.0);
 
 }
 
@@ -99,7 +101,7 @@ void Camera::SetScreenSize (int screenWidth, int screenHeight) {
 
 	this -> screenWidth = screenWidth;
 	this -> screenHeight = screenHeight;
-
+	this -> screenWidthRatio = screenWidth / screenHeight;
 }
 
 Matrix Camera::GetModelViewMatrix() {

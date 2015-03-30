@@ -54,9 +54,11 @@ void Cylinder::draw() {
 
 		glBegin(GL_TRIANGLES); // sets the shapes that openGL draws and determines
                            // the number of vertices that are necessary
-		glNormal3f(face.nx, face.ny, face.nz);
+		glNormal3f(face.a.nx, face.a.ny, face.a.nz);
 		glVertex3f(x1, y1, z1);  // set the three vertices for the triangle
+		//glNormal3f(face.b.nx, face.b.ny, face.b.nz);
 		glVertex3f(x2, y2, z2);  // the direction of the front face depends 
+		//glNormal3f(face.c.nx, face.c.ny, face.c.nz);
 		glVertex3f(x3, y3, z3);  // on the order in which you put the vertices
 		glEnd();
 	}
@@ -115,17 +117,26 @@ void Cylinder::makeLid(float theta, float initX, float initY, float initZ,
 		vertex1.x = initX;
 		vertex1.y = initY;
 		vertex1.z = initZ; 
- 
+		vertex1.nx = vertex1.x;
+		vertex1.ny = vertex1.y - 1.0f;
+ 		vertex1.nz = vertex1.z;
+
 		initX = (radius * cos(theta));
 		initZ = (radius * sin(theta));
 
 		vertex2.x = initX;
 		vertex2.y = initY;
 		vertex2.z = initZ; 
+		vertex2.nx = vertex2.x;
+		vertex2.ny = vertex2.y - 1.0f;
+ 		vertex2.nz = vertex2.z;
 
 		vertex3.x = 0.0f;
 		vertex3.z = 0.0f;
 		vertex3.y = -0.5f;
+		vertex3.nx = vertex3.x;
+		vertex3.ny = vertex3.y - 1.0f;
+ 		vertex3.nz = vertex3.z;
 
 		vertexList->addVertex(vertex1.x, vertex1.y, vertex1.z, vertex1.x, vertex1.y - 1.0f, vertex1.z);
 		vertexList->addVertex(vertex2.x, vertex2.y, vertex2.z, vertex2.x, vertex2.y - 1.0f, vertex2.z);
@@ -141,6 +152,9 @@ void Cylinder::makeLid(float theta, float initX, float initY, float initZ,
 		vertex3.y = 0.5f;
 		vertex2.y = 0.5f;
 		vertex1.y = 0.5f;
+		vertex1.ny = vertex1.y - 1.0f;
+		vertex2.ny = vertex2.y - 1.0f;
+		vertex3.ny = vertex3.y - 1.0f;
 
 		vertexList->addVertex(vertex1.x, vertex1.y, vertex1.z, vertex1.x, vertex1.y + 1.0f, vertex1.z);
 		vertexList->addVertex(vertex2.x, vertex2.y, vertex2.z, vertex2.x, vertex2.y + 1.0f, vertex2.z);
@@ -169,20 +183,32 @@ void Cylinder::makeSides(float theta, float initX, float initY, float initZ,
 			vertex1.x = initX;
 			vertex1.y = initY;
 			vertex1.z = initZ; 
+			vertex1.nx = vertex1.x * 2.0f;
+			vertex1.ny = vertex1.y;
+ 			vertex1.nz = vertex1.z * 2.0f;
 
 			vertex2.x = initX;
 			vertex2.y = initY + stackHeight;
 			vertex2.z = initZ; 
+			vertex2.nx = vertex2.x * 2.0f;
+			vertex2.ny = vertex2.y;
+ 			vertex2.nz = vertex2.z * 2.0f;
 
 			initX = (radius * cos(theta));
 			initZ = (radius * sin(theta));
 			vertex3.x = initX;
 			vertex3.y = initY;
 			vertex3.z = initZ; 
+			vertex3.nx = vertex3.x * 2.0f;
+			vertex3.ny = vertex3.y;
+ 			vertex3.nz = vertex3.z * 2.0f;
 
 			vertex4.x = initX;
 			vertex4.y = initY + stackHeight;
 			vertex4.z = initZ; 
+			vertex4.nx = vertex4.x * 2.0f;
+			vertex4.ny = vertex4.y;
+ 			vertex4.nz = vertex4.z * 2.0f;
 
 			Vector v1(vertex1.x - vertex2.x, vertex1.y - vertex2.y, vertex1.z - vertex2.z);
 			Vector v2(vertex1.x - vertex3.x, vertex1.y - vertex3.y, vertex1.z - vertex3.z);
