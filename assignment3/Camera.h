@@ -65,8 +65,8 @@ class Camera {
 		double nearPlane;
 		double farPlane;
 
-		int screenWidth;
-		int screenHeight;
+		double screenWidth;
+		double screenHeight;
 
 		double filmPlanDepth;
 		double screenWidthRatio;

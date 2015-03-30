@@ -63,7 +63,7 @@ Matrix Camera::GetProjectionMatrix() {
 	// Scale matrix
 	double m2e11, m2e22, m2e33;
 	m2e11 = 1 / (this->farPlane * tan(viewAngle / 2));
-	m2e22 = 1 / (this->farPlane * tan(viewHeightAngle / 2));
+	m2e22 = 1 / (this->farPlane * (GetScreenWidthRatio() * tan(viewHeightAngle / 2)));
 	m2e33 = 1 / farPlane;
 	M2 = Matrix (m2e11, 0, 0, 0,
 				  0, m2e22, 0, 0,
@@ -78,10 +78,9 @@ Matrix Camera::GetProjectionMatrix() {
 void Camera::SetViewAngle (double viewAngle) {
 	viewAngle = viewAngle * (PI / 180);
 
-	this -> viewAngle = viewAngle;
+	this -> viewAngle = viewAngle;	
 	this -> viewHeightAngle = viewAngle;
 	this -> filmPlanDepth = -1.0 / tan((viewAngle*RAD) / 2.0);
-	//this -> filmPlanDepth = -1.0 / tan((viewAngle) / 2.0);
 
 }
 
@@ -99,9 +98,12 @@ void Camera::SetFarPlane (double farPlane) {
 
 void Camera::SetScreenSize (int screenWidth, int screenHeight) {
 
-	this -> screenWidth = screenWidth;
-	this -> screenHeight = screenHeight;
-	this -> screenWidthRatio = screenWidth / screenHeight;
+	this -> screenWidth = (double)screenWidth;
+	this -> screenHeight = (double)screenHeight;
+	this -> screenWidthRatio = this -> screenHeight / this -> screenWidth;
+	printf("r:%f\n", screenWidthRatio);
+
+
 }
 
 Matrix Camera::GetModelViewMatrix() {
