@@ -149,7 +149,7 @@ void setupCamera()
 		camera->Orient(cameraData.pos, cameraData.lookAt, cameraData.up);
 	}
 
-	viewAngle = camera->GetViewAngle();
+	viewAngle = cameraData.heightAngle;
 	Point eyeP = camera->GetEyePoint();
 	Vector lookV = camera->GetLookVector();
 	eyeX = eyeP[0];
