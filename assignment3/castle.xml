@@ -183,11 +183,13 @@
       </object>
     </transblock>
 
-
-
-
-
-
+    <transblock>
+      <translate x="-4.5" y="-0.35" z="0"/>
+      <scale x="3.5" y="0.2" z="2"/>
+      <object type="primitive" name="cube">
+        <diffuse r="0.8" g="0.2" b="0"/>
+      </object>
+    </transblock>
 
 
     <!-- The towers -->
