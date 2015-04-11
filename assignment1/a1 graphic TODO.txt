@@ -1,0 +1,23 @@
+- Only JUNCTIONS or KINKS hace more than one normal.
+
+ALL OTHER VERTICES only have one normal. Around the cylinder, around the sphere, all of these vertices only have ONE NORMAL.
+
+Fix your code for next assignment.
+
+FIX CONE. MAKE every layer minimum amount of triangles.
+
+Typical data structure (don't have to redo). Triangle array, tri has three verts and three edges. Then you have array of ALL vertices, and everything in the first array is just a pointer. This reduces redundancy. EVERYTHING one vertex, EXCEPT things at "kink," those are TWO vertices in the same place.
+
+All verst get one normal, things at kinks are actually more than one vert (in the same place)
+
+You have an edge list and a vert list, and TONS And tons of pointers. all doubly linked. Some things are easier to process as verts, others as edges.
+
+
+DON'T REDO YOUR code.
+
+YOU WILL FIX NORMALS.
+
+You don't have to redraw everything. Shouldn't REMAKE THE LIST unless x or y segments change.
+
+Look out for division by integer. (x segments and y segments)
+

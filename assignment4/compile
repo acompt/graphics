@@ -1,0 +1,1 @@
+g++ Assignment4.cpp Camera.cpp FaceList.cpp VertexList.cpp Cube.cpp CubeList.cpp Cylinder.cpp Cone.cpp Sphere.cpp Coil.cpp tinystr.cpp tinyxml.cpp tinyxmlerror.cpp tinyxmlparser.cpp SceneParser.cpp -w -I/usr/local/Cellar/glui/2.36/include/ -framework OpenGL -framework GLUT /usr/local/Cellar/glui/2.36/lib/libglui.a -o a4
