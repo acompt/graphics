@@ -4,6 +4,7 @@
 #include <fstream>
 #include <string>
 #include <GL/glui.h>
+#include <math.h>
 #include "Shape.h"
 #include "Cube.h"
 #include "Cylinder.h"
@@ -278,7 +279,7 @@ Vector getShapeSpecNormal(objNode* iter, Vector ray, double t){
 	}
 }
 
-void putPixel(int i, int j, double smallest_t, Vector norm, objNode* obj, Point worldcord){
+void putPixel(int i, int j, double smallest_t, Vector norm, objNode* obj, Point worldcord) {
 	
 	if (smallest_t == -1.0) {
 		setPixel(pixels, i, j, 0, 0, 0);
@@ -286,22 +287,66 @@ void putPixel(int i, int j, double smallest_t, Vector norm, objNode* obj, Point 
 	}
 
 	int numLights = parser->getNumLights();
-	double red, green, blue, sumR, sumG, sumB;
+	double red, green, blue, redA, greenA, blueA, redD, greenD, blueD, sumR, sumG, sumB;
+	SceneLightData data;
+	SceneGlobalData global_data;
+	SceneColor color;
+	double dotProd;
+	int redInt, greenInt, blueInt;
+	Vector Lm;
 
-	float ka = parser->m_globalData.ka;
+	parser->getGlobalData(global_data);
 
-	red = obj.material.cAmbient.r;
-	green = obj.material.cAmbient.g;
-	blue = obj.material.cAmbient.b;
+	float ka = global_data.ka;
+	float kd = global_data.kd;
+
+	redA = obj->material.cAmbient.r;
+	greenA = obj->material.cAmbient.g;
+	blueA = obj->material.cAmbient.b;
+
+	redD = obj->material.cDiffuse.r;
+	greenD = obj->material.cDiffuse.g;
+	blueD = obj->material.cDiffuse.b;
+
 
 	sumR = 0;
+	sumB = 0;
+	sumG = 0;
+
 	for (int m = 0; m < numLights; m++) {
-		
+		parser->getLightData(m, data);
+
+		color = data.color;
+
+		if (data.type == LIGHT_POINT){
+			Lm = worldcord - data.pos;
+			Lm.normalize();
+		} else if (data.type == LIGHT_DIRECTIONAL) {
+			Lm = data.dir;
+			Lm.normalize();
+		} else { 
+			// ERROR 
+		}
+
+		dotProd = dot(norm, Lm);
+
+		sumR += kd * redD * color.r * dotProd;
+		sumG += kd * greenD * color.g * dotProd;
+		sumB += kd * blueD * color.b * dotProd;
+
 	}
 
+	red = ka * redA + sumR;
+	blue = ka * blueA + sumB;
+	green = ka * greenA + sumG;
+
+	// TODO CHECK THIS. PROB DON'T NEED 255
+	redInt = round(255*red);
+	greenInt = round(255*green);
+	blueInt = round(255*blue);
 
 
-
+	setPixel(pixels, i, j, redInt, greenInt, blueInt);
 
 }
 
