@@ -42,7 +42,7 @@ double windowYSize = 800;
 void storeObj(PrimitiveType n_type, Matrix n_tMat, SceneMaterial n_material);
 void addObject(SceneNode* node, Matrix curMat);
 double getShapeSpecIntersect(objNode* iter, Vector ray, int x, int y);
-void putPixel(int i, int j, double smallest_t, Vector norm, objNode* obj);
+void putPixel(int i, int j, double smallest_t, Vector norm, objNode* obj, Point worldcord);
 Vector getShapeSpecNormal(objNode* iter, Vector ray, double t);
 
 /** These are GLUI control panel objects ***/
@@ -202,6 +202,7 @@ void callback_start(int id) {
 
 	objNode* iter;
 	Vector ray;
+	Point worldcord;
 	for (int i = 0; i < pixelWidth; i++) {
 		for (int j = 0; j < pixelHeight; j++) {
 
@@ -225,8 +226,8 @@ void callback_start(int id) {
 
 				iter = iter->next;
 			}
-
-			putPixel(i, j, smallest_t, norm, theObj);
+			worldcord = camera->GetEyePoint() + smallest_t * ray;
+			putPixel(i, j, smallest_t, norm, theObj, worldcord);
 
 		}
 	}
@@ -277,7 +278,7 @@ Vector getShapeSpecNormal(objNode* iter, Vector ray, double t){
 	}
 }
 
-void putPixel(int i, int j, double smallest_t, Vector norm, objNode* obj){
+void putPixel(int i, int j, double smallest_t, Vector norm, objNode* obj, Point worldcord){
 	
 	if (smallest_t == -1.0) {
 		setPixel(pixels, i, j, 0, 0, 0);

@@ -35,6 +35,9 @@ Cylinder::Cylinder() {
 
 double Cylinder::Intersect(Point eyePointP, Vector rayV, Matrix transformMatrix) {
 	/* transformMatrix from obj to world space. */
+	Matrix inv = transformMatrix.inverse();
+	eyePointP = inv * eyePointP;
+	rayV = inv * rayV;
 	double t = -1.0;
 	double r = 0.5;
 
