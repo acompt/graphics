@@ -42,7 +42,7 @@ double windowYSize = 800;
 void storeObj(PrimitiveType n_type, Matrix n_tMat, SceneMaterial n_material);
 void addObject(SceneNode* node, Matrix curMat);
 double getShapeSpecIntersect(objNode* iter, Vector ray, int x, int y);
-void putPixel(int i, int j, double smallest_t, Vector norm);
+void putPixel(int i, int j, double smallest_t, Vector norm, objNode* obj);
 Vector getShapeSpecNormal(objNode* iter, Vector ray, double t);
 
 /** These are GLUI control panel objects ***/
@@ -211,6 +211,7 @@ void callback_start(int id) {
 			double t;
 			double smallest_t = -1;
 			Vector norm;
+			objNode* theObj = NULL;
 			while (iter != NULL) {
 
 
@@ -219,12 +220,13 @@ void callback_start(int id) {
 				if ((smallest_t == -1.0) || (t < smallest_t)) {
 					smallest_t = t;
 					norm = getShapeSpecNormal(iter, ray, smallest_t);
+					theObj = iter;
 				}
 
 				iter = iter->next;
 			}
 
-			putPixel(i, j, smallest_t, norm);
+			putPixel(i, j, smallest_t, norm, theObj);
 
 		}
 	}
@@ -275,8 +277,31 @@ Vector getShapeSpecNormal(objNode* iter, Vector ray, double t){
 	}
 }
 
-void putPixel(int i, int j, double smallest_t, Vector norm) {
-	//do nothing
+void putPixel(int i, int j, double smallest_t, Vector norm, objNode* obj){
+	
+	if (smallest_t == -1.0) {
+		setPixel(pixels, i, j, 0, 0, 0);
+		return;
+	}
+
+	int numLights = parser->getNumLights();
+	double red, green, blue, sumR, sumG, sumB;
+
+	float ka = parser->m_globalData.ka;
+
+	red = obj.material.cAmbient.r;
+	green = obj.material.cAmbient.g;
+	blue = obj.material.cAmbient.b;
+
+	sumR = 0;
+	for (int m = 0; m < numLights; m++) {
+		
+	}
+
+
+
+
+
 }
 
 
