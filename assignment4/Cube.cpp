@@ -28,6 +28,7 @@ File name: Cube.cpp
 
 bool static crossNotDone(float a, float b, float sgn);
 bool static downNotDone(float a, float b, float sgn);
+static double multV(Vector v1, Vector v2);
 
 Vert static getMid(Vert v1, Vert v2);
 
@@ -46,7 +47,72 @@ Cube::Cube()
 }
 
 double Cube::Intersect(Point eyePointP, Vector rayV, Matrix transformMatrix) {
-	return 0;
+
+	Matrix inv = invert(transformMatrix);
+	eyePointP = inv * eyePointP;
+	rayV = inv * rayV;
+	double t = -1.0;
+	double r = 0.5;
+	double t1, t2, t3, t4, t5, t6, tsmall;
+	Point px1, px2, py1, py2, pz1, pz2;
+	Vector nx = Vector(1, 0, 0);
+	Vector ny = Vector(0, 1, 0);
+	Vector nz = Vector(0, 0, 1);
+	Point x1 = Point(0.5, 0, 0);
+	Point x2 = Point(-0.5, 0, 0);
+	Point y1 = Point(0, 0.5, 0);
+	Point y2 = Point(0, -0.5, 0);
+	Point z1 = Point(0, 0, 0.5);
+	Point z2 = Point(0, 0, -0.5);
+
+	t1 = -(multV((eyePointP - x1), nx)) / multV(rayV, nx);
+	px1 = eyePointP + t1*rayV;
+	t2 = -(multV((eyePointP - x2), nx)) / multV(rayV, nx);
+	px2 = eyePointP + t2*rayV;
+
+	t3 = -(multV((eyePointP - y1), ny)) / multV(rayV, ny);
+	py1 = eyePointP + t3*rayV;
+	t4 = -(multV((eyePointP - y2), ny)) / multV(rayV, ny);
+	py2 = eyePointP + t4*rayV;
+
+	t5 = -(multV((eyePointP - z1), nz)) / multV(rayV, nz);
+	py1 = eyePointP + t5*rayV;
+	t6 = -(multV((eyePointP - z2), nz)) / multV(rayV, nz);
+	py2 = eyePointP + t6*rayV;
+
+	//if t3, t4 within square, else -1
+	tsmall = -1.0;
+
+	if(px1[1] < 0.5 && px1[1] > -0.5 && px1[2] < 0.5 && px1[2] > -0.5) {
+		tsmall = t1;
+	}
+	if(px2[1] < 0.5 && px2[1] > -0.5 && px2[2] < 0.5 && px2[2] > -0.5) {
+		if (tsmall != -1.0)
+			tsmall = fmin(t2, tsmall);
+		else tsmall = t2;
+	}
+	if(py1[0] < 0.5 && py1[0] > -0.5 && py1[2] < 0.5 && py1[2] > -0.5) {
+		if (tsmall != -1.0)
+			tsmall = fmin(t3, tsmall);
+		else tsmall = t3;
+	}
+	if(py2[0] < 0.5 && py2[0] > -0.5 && py2[2] < 0.5 && py2[2] > -0.5) {
+		if (tsmall != -1.0)
+			tsmall = fmin(t4, tsmall);
+		else tsmall = t4;
+	}
+	if(pz1[0] < 0.5 && pz1[0] > -0.5 && pz1[1] < 0.5 && pz1[1] > -0.5) {
+		if (tsmall != -1.0)
+			tsmall = fmin(t5, tsmall);
+		else tsmall = t5;
+	}
+	if(pz2[0] < 0.5 && pz2[0] > -0.5 && pz2[1] < 0.5 && pz2[1] > -0.5) {
+		if (tsmall != -1.0)
+			tsmall = fmin(t6, tsmall);
+		else tsmall = t6;
+	}
+
+	return tsmall;
 }
 
 Vector Cube::findIsectNormal(Point eyePoint, Vector ray, double dist){
@@ -54,6 +120,18 @@ Vector Cube::findIsectNormal(Point eyePoint, Vector ray, double dist){
 }
 
 
+static double multV(Vector v1, Vector v2) {
+
+	double toR;
+	double x, y, z;
+
+	x = v1[0] * v2[0];
+	y = v1[1] * v2[1];
+	z = v1[2] * v2[2];
+
+	toR = x + y + z;
+	return toR;
+}
 
 void Cube::draw()
 {

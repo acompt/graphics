@@ -35,7 +35,7 @@ Cylinder::Cylinder() {
 
 double Cylinder::Intersect(Point eyePointP, Vector rayV, Matrix transformMatrix) {
 	/* transformMatrix from obj to world space. */
-	Matrix inv = transformMatrix.inverse();
+	Matrix inv = invert(transformMatrix);
 	eyePointP = inv * eyePointP;
 	rayV = inv * rayV;
 	double t = -1.0;
@@ -65,11 +65,12 @@ double Cylinder::Intersect(Point eyePointP, Vector rayV, Matrix transformMatrix)
 	p2 = eyePointP + t4*rayV;
 
 	//if t3, t4 within circle, else -1
-	if (p1[0]*p1[0] + p1[1]*p1[1] > r*r) {
+	//check p1[1] should be .5
+	if (p1[0]*p1[0] + p1[2]*p1[2] > r*r) {
 		t3 = -1.0;
 		tsmall = t4;
 	}
-	if (p2[0]*p2[0] + p2[1]*p2[1] > r*r) {
+	if (p2[0]*p2[0] + p2[2]*p2[2] > r*r) {
 		t4 = -1.0;
 		tsmall = t3;
 	}
@@ -124,8 +125,6 @@ static double multV(Vector v1, Vector v2) {
 
 	toR = x + y + z;
 	return toR;
-
-
 }
 
 void Cylinder::draw() {
