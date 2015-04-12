@@ -24,6 +24,11 @@ File name: Sphere.cpp
 #define NEG -0.5
 #define POS 0.5
 
+static double multP(Point p1, Point p2);
+static double multV(Vector v1, Vector v2);
+static double multPV(Point p, Vector v);
+
+
 /* *  Static Functions * */
 
 static Vertex getVert(double r, double theta, double phi);
@@ -33,6 +38,83 @@ static Vertex getVert(double r, double theta, double phi);
 Sphere::Sphere() {
 	faceList = new FaceList;
 	vertexList = new VertexList;
+}
+
+
+double Sphere::Intersect(Point eyePointP, Vector rayV, Matrix transformMatrix) {
+
+	/* transformMatrix from obj to world space. */
+	double t = -1.0;
+	double r = 0.5;
+
+	double A, B, C, t1, t2;
+
+	A = multV(rayV, rayV);
+	B = 2 * multPV(eyePointP, rayV);
+	C = (multP(eyePointP, eyePointP)) - r*r;
+
+	double check = B*B - 4*A*C;
+
+	if (check < 0) {
+		return -1;
+	}
+
+	t1 = ((-B) + sqrt(check)) / (2*A);
+	t2 = ((-B) - sqrt(check)) / (2*A);
+
+	return fmin(t1, t2);
+
+
+
+	return 0;
+}
+
+static double multP(Point p1, Point p2){
+
+	double toR;
+	double x, y, z;
+
+	x = p1[0] * p2[0];
+	y = p1[1] * p2[1];
+	z = p1[2] * p2[2];
+
+	toR = x + y + z;
+	return toR;
+
+}
+
+static double multPV(Point p, Vector v){
+
+	double toR;
+	double x, y, z;
+
+	x = p[0] * v[0];
+	y = p[1] * v[1];
+	z = p[2] * v[2];
+
+	toR = x + y + z;
+	return toR;
+
+}
+
+
+static double multV(Vector v1, Vector v2) {
+
+	double toR;
+	double x, y, z;
+
+	x = v1[0] * v2[0];
+	y = v1[1] * v2[1];
+	z = v1[2] * v2[2];
+
+	toR = x + y + z;
+	return toR;
+
+
+}
+
+Vector Sphere::findIsectNormal(Point eyePoint, Vector ray, double dist){
+	return Vector();
 }
 
 void Sphere::draw() {

@@ -35,6 +35,10 @@ public:
 
 	void makeSides(float theta, float initX, float initY, float initZ, 
 				float addTheta, float radius, float stackHeight);
+
+	double Intersect(Point eyePointP, Vector rayV, Matrix transformMatrix);
+	Vector findIsectNormal(Point eyePoint, Vector ray, double dist);
+
 protected:
 
 	FaceList *faceList;

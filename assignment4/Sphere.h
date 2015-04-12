@@ -29,6 +29,10 @@ public:
 
 	void makeFaceList();
 
+	double Intersect(Point eyePointP, Vector rayV, Matrix transformMatrix);
+	Vector findIsectNormal(Point eyePoint, Vector ray, double dist);
+
+
 protected:
 
 	FaceList *faceList;

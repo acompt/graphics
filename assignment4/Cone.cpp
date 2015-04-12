@@ -30,6 +30,16 @@ Cone::Cone() {
 	vertexList = new VertexList;
 }
 
+double Cone::Intersect(Point eyePointP, Vector rayV, Matrix transformMatrix) {
+	return 0;
+}
+
+Vector Cone::findIsectNormal(Point eyePoint, Vector ray, double dist){
+	return Vector();
+}
+
+
+
 void Cone::draw() {
 
 	faceList->makeList(m_segmentsX, m_segmentsY, 20);

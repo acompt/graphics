@@ -14,6 +14,13 @@
 
 using namespace std;
 
+struct objNode {
+	PrimitiveType type;
+	Matrix tMat;
+	SceneMaterial material;
+	objNode* next;
+};
+
 /** These are the live variables passed into GLUI ***/
 int  isectOnly = 1;
 
@@ -27,6 +34,16 @@ float eyeZ = 2;
 float lookX = -2;
 float lookY = -2;
 float lookZ = -2;
+
+
+double windowXSize = 800;
+double windowYSize = 800;
+
+void storeObj(PrimitiveType n_type, Matrix n_tMat, SceneMaterial n_material);
+void addObject(SceneNode* node, Matrix curMat);
+double getShapeSpecIntersect(objNode* iter, Vector ray);
+void putPixel(int i, int j, double smallest_t, Vector norm);
+Vector getShapeSpecNormal(objNode* iter, Vector ray, double t);
 
 /** These are GLUI control panel objects ***/
 int  main_window;
@@ -44,6 +61,86 @@ Sphere* sphere = new Sphere();
 SceneParser* parser = NULL;
 Camera* camera = new Camera();
 
+objNode* head;
+objNode* tail;
+
+void createObjList(SceneNode* root) {
+
+	Matrix idMat = Matrix();
+	head = NULL;
+	tail = NULL;
+	addObject(root, idMat);
+}
+
+
+void addObject(SceneNode* node, Matrix curMat) {
+
+	if (node == NULL) {
+		return;
+	}
+
+	Matrix toMult;
+	Vector v;
+	int transforms = node->transformations.size();
+	for(int i = 0; i < transforms; i++) {
+		TransformationType type = node->transformations[i]->type;
+
+		if (type == TRANSFORMATION_TRANSLATE){
+
+			v = node->transformations[i]->translate;
+			toMult = trans_mat(v);
+
+		} else if (type == TRANSFORMATION_SCALE) {
+			v = node->transformations[i]->scale;
+			toMult = scale_mat(v);
+
+		} else if (type == TRANSFORMATION_ROTATE) {
+			v = node->transformations[i]->rotate;
+			float angle = node->transformations[i]->angle;
+
+			Matrix toMult = rot_mat(v, angle);
+
+		} else if (type == TRANSFORMATION_MATRIX) {
+
+			Matrix toMult = node->transformations[i]->matrix;
+		}	
+		curMat = toMult * curMat;
+	}
+
+	int primitives = node->primitives.size();
+
+	for(int i = 0; i < primitives; i++) {
+		
+		storeObj(node->primitives[i]->type, curMat, node->primitives[i]->material);
+	}
+
+	int size = node->children.size();
+
+	for(int i=0; i < size; i++){
+   		addObject(node->children[i], curMat);
+	}
+}
+
+void storeObj(PrimitiveType n_type, Matrix n_tMat, SceneMaterial n_material) {
+
+	objNode* newNode = new objNode();
+
+	newNode -> type = n_type;
+	newNode -> tMat = n_tMat;
+	newNode -> material = n_material;
+	newNode -> next = NULL;
+
+	if (head == NULL) {
+		head = newNode;
+		tail = newNode;
+	} else {
+		tail -> next = newNode;
+		tail = newNode;
+	}
+}
+
+
+
 void setupCamera();
 void updateCamera();
 
@@ -51,6 +148,35 @@ void setPixel(GLubyte* buf, int x, int y, int r, int g, int b) {
 	buf[(y*pixelWidth + x) * 3 + 0] = (GLubyte)r;
 	buf[(y*pixelWidth + x) * 3 + 1] = (GLubyte)g;
 	buf[(y*pixelWidth + x) * 3 + 2] = (GLubyte)b;
+}
+
+Vector generateRay(int pixelX, int pixelY) {
+
+	double a, b, w, h;
+	Point q, s;
+	Vector UVec, VVec, ray;
+	double n = camera->GetNearPlane();
+	double ratio = camera->GetScreenWidthRatio();
+	double angle = camera->GetViewAngle();
+
+	h = n * tan(angle/2);
+	w = h * ratio;
+
+	a = -w + (2*w)*((double)pixelX/(double)windowXSize);
+	b = h - (2*h)*((double)pixelY/(double)windowYSize);
+	q = camera->GetEyePoint() + n*camera->GetLookVector();
+
+	UVec = camera->getU();
+	VVec = camera->getV();
+
+
+	s = q + a*UVec + b*VVec;
+
+	ray = s - camera->GetEyePoint();
+
+	ray.normalize();
+
+	return ray;
 }
 
 void callback_start(int id) {
@@ -74,20 +200,81 @@ void callback_start(int id) {
 
 	cout << "(w, h): " << pixelWidth << ", " << pixelHeight << endl;
 
+	objNode* iter;
+	Vector ray;
 	for (int i = 0; i < pixelWidth; i++) {
 		for (int j = 0; j < pixelHeight; j++) {
-			//replace the following code
-			if ((i % 5 == 0) && (j % 5 == 0)) {
-				setPixel(pixels, i, j, 255, 0, 0);
+
+			ray = generateRay(i, j);
+
+			iter = head;
+			double t;
+			double smallest_t = -1;
+			Vector norm;
+			while (iter != NULL) {
+
+
+				t = getShapeSpecIntersect(iter, ray);
+
+				if ((smallest_t == -1.0) || (t < smallest_t)) {
+					smallest_t = t;
+					norm = getShapeSpecNormal(iter, ray, smallest_t);
+				}
+
+				iter = iter->next;
 			}
-			else {
-				setPixel(pixels, i, j, 128, 128, 128);
-			}
+
+			putPixel(i, j, smallest_t, norm);
+
 		}
 	}
 	glutPostRedisplay();
 }
 
+
+double getShapeSpecIntersect(objNode* iter, Vector ray){
+
+	Point eP = camera->GetEyePoint();
+	Matrix m = iter->tMat;
+
+	if (iter->type == SHAPE_CUBE) {
+		return cube->Intersect(eP, ray, m);
+	}
+	else if (iter->type == SHAPE_CYLINDER) {
+		return cylinder->Intersect(eP, ray, m);
+	}
+	else if (iter->type == SHAPE_CONE){
+		return cone->Intersect(eP, ray, m);
+	}else if (iter->type == SHAPE_SPHERE){
+		return sphere->Intersect(eP, ray, m);
+	} else {
+		return -1.0;
+	}
+
+}
+
+Vector getShapeSpecNormal(objNode* iter, Vector ray, double t){
+	Point eP = camera->GetEyePoint();
+
+	if (iter->type == SHAPE_CUBE) {
+		return cube->findIsectNormal(eP, ray, t);
+	}
+	else if (iter->type == SHAPE_CYLINDER) {
+		return cylinder->findIsectNormal(eP, ray, t);
+	}
+	else if (iter->type == SHAPE_CONE){
+		return cone->findIsectNormal(eP, ray, t);
+	}else if (iter->type == SHAPE_SPHERE){
+		return sphere->findIsectNormal(eP, ray, t);
+	} else {
+		return Vector();
+		// ERROR MESSAGE?
+	}
+}
+
+void putPixel(int i, int j, double smallest_t, Vector norm) {
+	//do nothing
+}
 
 
 void callback_load(int id) {
@@ -103,6 +290,8 @@ void callback_load(int id) {
 	parser = new SceneParser (filenamePath);
 	cout << "success? " << parser->parse() << endl;
 
+	SceneNode* root = parser->getRootNode();
+	createObjList(root);
 	setupCamera();
 }
 

@@ -45,6 +45,16 @@ Cube::Cube()
 
 }
 
+double Cube::Intersect(Point eyePointP, Vector rayV, Matrix transformMatrix) {
+	return 0;
+}
+
+Vector Cube::findIsectNormal(Point eyePoint, Vector ray, double dist){
+	return Vector();
+}
+
+
+
 void Cube::draw()
 {
 

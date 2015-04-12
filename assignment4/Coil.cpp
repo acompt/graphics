@@ -42,6 +42,16 @@ Coil::Coil() {
 	vertexList = new VertexList;
 }
 
+double Coil::Intersect(Point eyePointP, Vector rayV, Matrix transformMatrix) {
+	return 0;
+}
+
+Vector Coil::findIsectNormal(Point eyePoint, Vector ray, double dist){
+	return Vector();
+}
+
+
+
 void Coil::draw() {
 
 	faceList->makeList(m_segmentsX, m_segmentsY, 20);

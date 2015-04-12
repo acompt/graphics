@@ -28,6 +28,16 @@ Cylinder::Cylinder() {
 	vertexList = new VertexList;
 }
 
+double Cylinder::Intersect(Point eyePointP, Vector rayV, Matrix transformMatrix) {
+	return 0;
+}
+
+Vector Cylinder::findIsectNormal(Point eyePoint, Vector ray, double dist){
+	return Vector();
+}
+
+
+
 void Cylinder::draw() {
 
 	faceList->makeList(m_segmentsX, m_segmentsY, 10);

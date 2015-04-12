@@ -21,6 +21,17 @@ void Camera::Reset() {
 	SetFarPlane(500);
 }
 
+Vector Camera::getV(){
+	return this->v;
+
+}
+
+Vector Camera::getU(){
+	return this->u;
+
+
+}
+
 void Camera::Orient(Point& eye, Point& focus, Vector& up) {
 
 	Vector look = Vector(focus[0] - eye[0],
