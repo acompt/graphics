@@ -41,7 +41,7 @@ double windowYSize = 800;
 
 void storeObj(PrimitiveType n_type, Matrix n_tMat, SceneMaterial n_material);
 void addObject(SceneNode* node, Matrix curMat);
-double getShapeSpecIntersect(objNode* iter, Vector ray);
+double getShapeSpecIntersect(objNode* iter, Vector ray, int x, int y);
 void putPixel(int i, int j, double smallest_t, Vector norm);
 Vector getShapeSpecNormal(objNode* iter, Vector ray, double t);
 
@@ -214,7 +214,7 @@ void callback_start(int id) {
 			while (iter != NULL) {
 
 
-				t = getShapeSpecIntersect(iter, ray);
+				t = getShapeSpecIntersect(iter, ray, i, j);
 
 				if ((smallest_t == -1.0) || (t < smallest_t)) {
 					smallest_t = t;
@@ -232,7 +232,7 @@ void callback_start(int id) {
 }
 
 
-double getShapeSpecIntersect(objNode* iter, Vector ray){
+double getShapeSpecIntersect(objNode* iter, Vector ray, int x, int y){
 
 	Point eP = camera->GetEyePoint();
 	Matrix m = iter->tMat;
@@ -241,7 +241,10 @@ double getShapeSpecIntersect(objNode* iter, Vector ray){
 		return cube->Intersect(eP, ray, m);
 	}
 	else if (iter->type == SHAPE_CYLINDER) {
-		return cylinder->Intersect(eP, ray, m);
+		if ((y > -0.5) && (y < 0.5))
+			return cylinder->Intersect(eP, ray, m);
+		else
+			return -1.0;
 	}
 	else if (iter->type == SHAPE_CONE){
 		return cone->Intersect(eP, ray, m);

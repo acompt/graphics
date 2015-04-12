@@ -23,20 +23,107 @@ File name: Cylinder.cpp
 #define NEG -0.5
 #define POS 0.5
 
+
+static double multP(Point p1, Point p2);
+static double multV(Vector v1, Vector v2);
+static double multPV(Point p, Vector v);
+
 Cylinder::Cylinder() {
 	faceList = new FaceList;
 	vertexList = new VertexList;
 }
 
 double Cylinder::Intersect(Point eyePointP, Vector rayV, Matrix transformMatrix) {
-	return 0;
+	/* transformMatrix from obj to world space. */
+	double t = -1.0;
+	double r = 0.5;
+
+	double A, B, C, t1, t2, t3, t4, tsmall;
+	Point p1, p2;
+	Vector n = Vector(1, 0, 0);
+	Point x1 = Point(0.5, 0, 0);
+	Point x2 = Point(-0.5, 0, 0);
+
+	A = rayV[0]*rayV[0] + rayV[2]*rayV[2];
+	B = 2 * (rayV[0]*eyePointP[0] + rayV[2]*eyePointP[2]);
+	C = eyePointP[0]*eyePointP[0] + eyePointP[2]*eyePointP[2] - r*r;
+
+	double check = B*B - 4*A*C;
+
+	if (check < 0) {
+		return -1;
+	}
+
+	t1 = ((-B) + sqrt(check)) / (2*A);
+	t2 = ((-B) - sqrt(check)) / (2*A);
+	t3 = -(multV((eyePointP - x1), n)) / multV(rayV, n);
+	p1 = eyePointP + t3*rayV;
+	t4 = -(multV((eyePointP - x2), n)) / multV(rayV, n);
+	p2 = eyePointP + t4*rayV;
+
+	//if t3, t4 within circle, else -1
+	if (p1[0]*p1[0] + p1[1]*p1[1] > r*r) {
+		t3 = -1.0;
+		tsmall = t4;
+	}
+	if (p2[0]*p2[0] + p2[1]*p2[1] > r*r) {
+		t4 = -1.0;
+		tsmall = t3;
+	}
+
+	if(tsmall > 0) 
+		return fmin(tsmall, fmin(t1, t2));
+	else
+		return fmin(t1, t2);
 }
 
 Vector Cylinder::findIsectNormal(Point eyePoint, Vector ray, double dist){
 	return Vector();
 }
 
+static double multP(Point p1, Point p2){
 
+	double toR;
+	double x, y, z;
+
+	x = p1[0] * p2[0];
+	y = p1[1] * p2[1];
+	z = p1[2] * p2[2];
+
+	toR = x + y + z;
+	return toR;
+
+}
+
+static double multPV(Point p, Vector v){
+
+	double toR;
+	double x, y, z;
+
+	x = p[0] * v[0];
+	y = p[1] * v[1];
+	z = p[2] * v[2];
+
+	toR = x + y + z;
+	return toR;
+
+}
+
+
+static double multV(Vector v1, Vector v2) {
+
+	double toR;
+	double x, y, z;
+
+	x = v1[0] * v2[0];
+	y = v1[1] * v2[1];
+	z = v1[2] * v2[2];
+
+	toR = x + y + z;
+	return toR;
+
+
+}
 
 void Cylinder::draw() {
 

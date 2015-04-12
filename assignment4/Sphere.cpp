@@ -66,7 +66,7 @@ double Sphere::Intersect(Point eyePointP, Vector rayV, Matrix transformMatrix) {
 
 
 
-	return 0;
+	//return 0;
 }
 
 static double multP(Point p1, Point p2){
