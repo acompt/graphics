@@ -1,6 +1,6 @@
 To do for assignment 3 (also double check assignment)
 
-1. fix lighting
+1. fix lighting / normals
 2. Make normals/lighting/shading correct. Make sure our robo looks like their robo.
-3. maybe make camera reset better
-4. make xml file
+3. aspect ratio
+

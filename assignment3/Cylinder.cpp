@@ -56,9 +56,11 @@ void Cylinder::draw() {
                            // the number of vertices that are necessary
 		glNormal3f(face.a.nx, face.a.ny, face.a.nz);
 		glVertex3f(x1, y1, z1);  // set the three vertices for the triangle
-		//glNormal3f(face.b.nx, face.b.ny, face.b.nz);
+		
+		glNormal3f(face.b.nx, face.b.ny, face.b.nz);
 		glVertex3f(x2, y2, z2);  // the direction of the front face depends 
-		//glNormal3f(face.c.nx, face.c.ny, face.c.nz);
+		
+		glNormal3f(face.c.nx, face.c.ny, face.c.nz);
 		glVertex3f(x3, y3, z3);  // on the order in which you put the vertices
 		glEnd();
 	}
@@ -152,9 +154,9 @@ void Cylinder::makeLid(float theta, float initX, float initY, float initZ,
 		vertex3.y = 0.5f;
 		vertex2.y = 0.5f;
 		vertex1.y = 0.5f;
-		vertex1.ny = vertex1.y - 1.0f;
-		vertex2.ny = vertex2.y - 1.0f;
-		vertex3.ny = vertex3.y - 1.0f;
+		vertex1.ny = vertex1.y + 1.0f;
+		vertex2.ny = vertex2.y + 1.0f;
+		vertex3.ny = vertex3.y + 1.0f;
 
 		vertexList->addVertex(vertex1.x, vertex1.y, vertex1.z, vertex1.x, vertex1.y + 1.0f, vertex1.z);
 		vertexList->addVertex(vertex2.x, vertex2.y, vertex2.z, vertex2.x, vertex2.y + 1.0f, vertex2.z);
@@ -164,6 +166,9 @@ void Cylinder::makeLid(float theta, float initX, float initY, float initZ,
 		v3 = cross(v5, v4);
 		v3.normalize();
 
+		// vertex1.ny = vertex1.y + 1.0f;
+		// vertex2.ny = vertex2.y + 1.0f;
+		// vertex3.ny = vertex3.y + 1.0f;
 		faceList->addFace(vertex1, vertex2, vertex3, -v3.at(0), -v3.at(1), -v3.at(2));
 		theta += addTheta;
 	}

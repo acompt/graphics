@@ -62,10 +62,14 @@ void Sphere::draw() {
 		glBegin(GL_TRIANGLES); // sets the shapes that openGL draws and determines
                            // the number of vertices that are necessary
 		
-		glNormal3f(face.nx, face.ny, face.nz);
-
+		//glNormal3f(face.nx, face.ny, face.nz);
+		glNormal3f(x1*2.0f, y1*2.0f, z1*2.0f);
 		glVertex3f(x1, y1, z1);  // set the three vertices for the triangle
+		
+		glNormal3f(x2*2.0f, y2*2.0f, z2*2.0f);
 		glVertex3f(x2, y2, z2);  // the direction of the front face depends 
+		
+		glNormal3f(x3*2.0f, y3*2.0f, z3*2.0f);
 		glVertex3f(x3, y3, z3);  // on the order in which you put the vertices
 		glEnd();
 	}

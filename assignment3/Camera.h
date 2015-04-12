@@ -73,4 +73,3 @@ class Camera {
 
 };
 #endif
-

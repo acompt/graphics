@@ -1,3 +1,4 @@
+
 #include "Camera.h"
 #include "stdio.h"
 
@@ -101,8 +102,11 @@ void Camera::SetScreenSize (int screenWidth, int screenHeight) {
 	this -> screenWidth = (double)screenWidth;
 	this -> screenHeight = (double)screenHeight;
 	this -> screenWidthRatio = this -> screenHeight / this -> screenWidth;
+<<<<<<< Updated upstream
 	printf("r:%f\n", screenWidthRatio);
 
+=======
+>>>>>>> Stashed changes
 
 }
 
