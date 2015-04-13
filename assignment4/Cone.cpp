@@ -26,6 +26,7 @@ File name: Cone.cpp
 #define POS 0.5
 
 static double multV(Vector v1, Vector v2);
+bool isEqual(double i, double j);
 
 Cone::Cone() {
 	faceList = new FaceList;
@@ -78,7 +79,27 @@ double Cone::Intersect(Point eyePointP, Vector rayV, Matrix transformMatrix) {
 }
 
 Vector Cone::findIsectNormal(Point eyePoint, Vector ray, double dist){
-	return Vector();
+
+
+	Point i = eyePoint + dist * ray;
+	Point origin =  Point(0, 0, 0);
+
+
+
+
+
+
+
+
+}
+
+bool isEqual(double i, double j) {
+
+	if ((abs(i - j) < eps) {
+		return true;
+	} else {
+		return false;
+	}
 }
 
 static double multV(Vector v1, Vector v2) {

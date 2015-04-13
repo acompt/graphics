@@ -182,6 +182,9 @@ Vector generateRay(int pixelX, int pixelY) {
 }
 
 void callback_start(int id) {
+
+	printf("LookX: %f\n", lookX);
+
 	cout << "start button clicked!" << endl;
 
 	if (parser == NULL) {
@@ -232,8 +235,6 @@ void callback_start(int id) {
 			}
 
 
-			printf("i: %d, j: %d --> t: %f\n", i, j, t);
-
 			worldcord = camera->GetEyePoint() + smallest_t * ray;
 			putPixel(i, j, smallest_t, norm, theObj, worldcord);
 
@@ -274,7 +275,7 @@ double getShapeSpecIntersect(objNode* iter, Vector ray, int x, int y){
 		t = sphere->Intersect(ep_obj, ray_obj, m);
 
 	} else {
-		
+
 		// Should never get here.
 		t = -1.0;
 	}

@@ -6,5 +6,4 @@ TODO:
 
 - Fix camera control shit
 
-- Standardize all intersect fcns so that incoming parameters are already transformed.
 
