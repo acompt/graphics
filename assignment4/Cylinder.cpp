@@ -53,12 +53,12 @@ double Cylinder::Intersect(Point eyePointP, Vector rayV, Matrix transformMatrix)
 
 	double check = B*B - 4*A*C;
 
-	if (check < 0) {
-		return -1;
+	if (check >= 0) {
+		t1 = ((-B) + sqrt(check)) / (2*A);
+		t2 = ((-B) - sqrt(check)) / (2*A);
 	}
 
-	t1 = ((-B) + sqrt(check)) / (2*A);
-	t2 = ((-B) - sqrt(check)) / (2*A);
+	
 	t3 = -(multV((eyePointP - x1), n)) / multV(rayV, n);
 	p1 = eyePointP + t3*rayV;
 	t4 = -(multV((eyePointP - x2), n)) / multV(rayV, n);
@@ -74,6 +74,8 @@ double Cylinder::Intersect(Point eyePointP, Vector rayV, Matrix transformMatrix)
 		t4 = -1.0;
 		tsmall = t3;
 	}
+
+	if (check < 0) return tsmall;
 
 	if(tsmall > 0) 
 		return fmin(tsmall, fmin(t1, t2));

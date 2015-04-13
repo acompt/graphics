@@ -52,14 +52,19 @@ double Cone::Intersect(Point eyePointP, Vector rayV, Matrix transformMatrix) {
 
 	double check = B*B - 4*A*C;
 
+	t4 = -(multV((eyePointP - x2), n)) / multV(rayV, n);
+	p2 = eyePointP + t4*rayV;
+
 	if (check < 0) {
-		return -1;
+		if (p2[0]*p2[0] + p2[2]*p2[2] < r*r) {
+			return t4;
+		}
+		else return -1.0;
 	}
 
 	t1 = ((-B) + sqrt(check)) / (2*A);
 	t2 = ((-B) - sqrt(check)) / (2*A);
-	t4 = -(multV((eyePointP - x2), n)) / multV(rayV, n);
-	p2 = eyePointP + t4*rayV;
+	
 
 	//if t3, t4 within circle, else -1
 	//check p1[1] should be .5
