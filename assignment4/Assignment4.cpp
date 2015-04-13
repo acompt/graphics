@@ -251,7 +251,10 @@ double getShapeSpecIntersect(objNode* iter, Vector ray, int x, int y){
 			return -1.0;
 	}
 	else if (iter->type == SHAPE_CONE){
-		return cone->Intersect(eP, ray, m);
+		if ((y > -0.5) && (y < 0.5))
+			return cone->Intersect(eP, ray, m);
+		else
+			return -1.0;
 	}else if (iter->type == SHAPE_SPHERE){
 		return sphere->Intersect(eP, ray, m);
 	} else {

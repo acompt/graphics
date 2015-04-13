@@ -25,20 +25,70 @@ File name: Cone.cpp
 #define NEG -0.5
 #define POS 0.5
 
+static double multV(Vector v1, Vector v2);
+
 Cone::Cone() {
 	faceList = new FaceList;
 	vertexList = new VertexList;
 }
 
 double Cone::Intersect(Point eyePointP, Vector rayV, Matrix transformMatrix) {
-	return 0;
+	Matrix inv = invert(transformMatrix);
+	eyePointP = inv * eyePointP;
+	rayV = inv * rayV;
+	double t = -1.0;
+	double r = 0.5;
+
+	double A, B, C, t1, t2, t4, tsmall;
+	Point p2;
+	Vector n = Vector(1, 0, 0);
+	Point x2 = Point(-0.5, 0, 0);
+
+	A = rayV[0]*rayV[0] + rayV[2]*rayV[2] - rayV[1]*rayV[1]*r*r;
+	B = 2 * (rayV[0]*eyePointP[0] + rayV[2]*eyePointP[2] - rayV[1]*eyePointP[1]*r*r)
+			- rayV[1]*r*r;
+	C = eyePointP[0]*eyePointP[0] + eyePointP[2]*eyePointP[2] - 
+		(.25 + eyePointP[1] + eyePointP[1]*eyePointP[1])*r*r;
+
+	double check = B*B - 4*A*C;
+
+	if (check < 0) {
+		return -1;
+	}
+
+	t1 = ((-B) + sqrt(check)) / (2*A);
+	t2 = ((-B) - sqrt(check)) / (2*A);
+	t4 = -(multV((eyePointP - x2), n)) / multV(rayV, n);
+	p2 = eyePointP + t4*rayV;
+
+	//if t3, t4 within circle, else -1
+	//check p1[1] should be .5
+	if (p2[0]*p2[0] + p2[2]*p2[2] < r*r) {
+		tsmall = t4;
+	}
+
+	if(tsmall > 0) 
+		return fmin(tsmall, fmin(t1, t2));
+	else
+		return fmin(t1, t2);
 }
 
 Vector Cone::findIsectNormal(Point eyePoint, Vector ray, double dist){
 	return Vector();
 }
 
+static double multV(Vector v1, Vector v2) {
 
+	double toR;
+	double x, y, z;
+
+	x = v1[0] * v2[0];
+	y = v1[1] * v2[1];
+	z = v1[2] * v2[2];
+
+	toR = x + y + z;
+	return toR;
+}
 
 void Cone::draw() {
 
