@@ -48,9 +48,7 @@ Cube::Cube()
 
 double Cube::Intersect(Point eyePointP, Vector rayV, Matrix transformMatrix) {
 
-	Matrix inv = invert(transformMatrix);
-	eyePointP = inv * eyePointP;
-	rayV = inv * rayV;
+
 	double t = -1.0;
 	double r = 0.5;
 	double t1, t2, t3, t4, t5, t6, tsmall;

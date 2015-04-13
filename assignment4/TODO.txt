@@ -1,3 +1,10 @@
 TODO:
 
 - Write destructor for the list of objects
+
+- Intersect and normals for all shapes
+
+- Fix camera control shit
+
+- Standardize all intersect fcns so that incoming parameters are already transformed.
+

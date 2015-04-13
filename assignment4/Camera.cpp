@@ -10,7 +10,7 @@ Camera::~Camera() {
 }
 
 void Camera::Reset() {
-	//default position????
+
 	SetViewAngle(45);
 	Point theP = Point(0, 0, 0);
 	Vector lVec = Vector(0, 0, -1);
@@ -90,7 +90,7 @@ Matrix Camera::GetProjectionMatrix() {
 
 
 void Camera::SetViewAngle (double viewAngle) {
-	viewAngle = viewAngle * (PI / 180);
+	//viewAngle = viewAngle * (PI / 180);
 
 	this -> viewAngle = viewAngle;	
 	this -> viewHeightAngle = viewAngle;

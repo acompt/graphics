@@ -37,8 +37,8 @@ float lookY = -2;
 float lookZ = -2;
 
 
-double windowXSize = 800;
-double windowYSize = 800;
+double windowXSize = 500;
+double windowYSize = 500;
 
 void storeObj(PrimitiveType n_type, Matrix n_tMat, SceneMaterial n_material);
 void addObject(SceneNode* node, Matrix curMat);
@@ -48,11 +48,12 @@ Vector getShapeSpecNormal(objNode* iter, Vector ray, double t);
 
 /** These are GLUI control panel objects ***/
 int  main_window;
-string filenamePath = "data\\general\\test.xml";
+string filenamePath = "data/general/unit_sphere.xml";
 GLUI_EditText* filenameTextField = NULL;
 GLubyte* pixels = NULL;
-int pixelWidth = 0, pixelHeight = 0;
-int screenWidth = 0, screenHeight = 0;
+
+int pixelWidth = 500, pixelHeight = 500;
+int screenWidth = 500, screenHeight = 500;
 
 /** these are the global variables used for rendering **/
 Cube* cube = new Cube();
@@ -207,13 +208,15 @@ void callback_start(int id) {
 	for (int i = 0; i < pixelWidth; i++) {
 		for (int j = 0; j < pixelHeight; j++) {
 
+
 			ray = generateRay(i, j);
 
 			iter = head;
-			double t;
-			double smallest_t = -1;
+			double t = -1.0;
+			double smallest_t = -1.0;
 			Vector norm;
 			objNode* theObj = NULL;
+
 			while (iter != NULL) {
 
 
@@ -227,6 +230,10 @@ void callback_start(int id) {
 
 				iter = iter->next;
 			}
+
+
+			printf("i: %d, j: %d --> t: %f\n", i, j, t);
+
 			worldcord = camera->GetEyePoint() + smallest_t * ray;
 			putPixel(i, j, smallest_t, norm, theObj, worldcord);
 
@@ -252,32 +259,37 @@ double getShapeSpecIntersect(objNode* iter, Vector ray, int x, int y){
 
 	if (iter->type == SHAPE_CUBE) {
 
-		t = cube->Intersect(ep_obj, ray, m);
+		t = cube->Intersect(ep_obj, ray_obj, m);
 	}
 	else if (iter->type == SHAPE_CYLINDER) {
 
-		t = cylinder->Intersect(ep_obj, ray, m);
+		t = cylinder->Intersect(ep_obj, ray_obj, m);
 	}
 	else if (iter->type == SHAPE_CONE){
 
-		t = cone->Intersect(ep_obj, ray, m);
+		t = cone->Intersect(ep_obj, ray_obj, m);
 
 	}else if (iter->type == SHAPE_SPHERE){
 
 		t = sphere->Intersect(ep_obj, ray_obj, m);
 
 	} else {
+		
 		// Should never get here.
 		t = -1.0;
 	}
 
-	if ((x == windowXSize/2) && (y == windowYSize/2)) {
+	// if ((x == windowXSize/2) && (y == windowYSize/2)) {
 
-		printf("x: %f, y: %f\n", x, y);
-		printf("ray: (%f, %f, %f.\n", ray[0], ray[1], ray[2]);
-		printf("t: %f.", t);
+	// 	printf("x: %d, y: %d\n", x, y);
+	// 	printf("ray: (%f, %f, %f.\n", ray[0], ray[1], ray[2]);
+	// 	printf("t: %f.\n", t);
+	// 	printf("Eye point: %f, %f, %f.\n", ep[0], ep[1], ep[2]);
+	// 	printf("ep_obj: %f, %f, %f.\n", ep_obj[0], ep_obj[1], ep_obj[2]);
 
-	}
+	// }
+
+		return t;
 
 }
 
@@ -338,9 +350,9 @@ void putPixel(int i, int j, double smallest_t, Vector norm, objNode* obj, Point 
 	blueD = obj->material.cDiffuse.b;
 
 
-	sumR = 0;
-	sumB = 0;
-	sumG = 0;
+	sumR = 0.0;
+	sumB = 0.0;
+	sumG = 0.0;
 
 	for (int m = 0; m < numLights; m++) {
 		parser->getLightData(m, data);
@@ -374,7 +386,12 @@ void putPixel(int i, int j, double smallest_t, Vector norm, objNode* obj, Point 
 	greenInt = round(255*green);
 	blueInt = round(255*blue);
 
+	// redInt = round(red);
+	// greenInt = round(green);
+	// blueInt = round(blue);
 
+
+	// printf("pixel, (%d, %d): r: %d g: %d b:%d \n", i, j, redInt, greenInt, blueInt );
 	setPixel(pixels, i, j, redInt, greenInt, blueInt);
 
 }

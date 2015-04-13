@@ -33,9 +33,8 @@ Cone::Cone() {
 }
 
 double Cone::Intersect(Point eyePointP, Vector rayV, Matrix transformMatrix) {
-	Matrix inv = invert(transformMatrix);
-	eyePointP = inv * eyePointP;
-	rayV = inv * rayV;
+
+
 	double t = -1.0;
 	double r = 0.5;
 
