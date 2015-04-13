@@ -23,12 +23,14 @@ File name: Cube.cpp
 #define POS 0.5
 
 
+
 /* *  Static Functions * */
 
 
 bool static crossNotDone(float a, float b, float sgn);
 bool static downNotDone(float a, float b, float sgn);
 static double multV(Vector v1, Vector v2);
+static bool isEqual(double i, double j);
 
 Vert static getMid(Vert v1, Vert v2);
 
@@ -48,14 +50,14 @@ Cube::Cube()
 
 double Cube::Intersect(Point eyePointP, Vector rayV, Matrix transformMatrix) {
 
-
-	double t = -1.0;
-	double r = 0.5;
 	double t1, t2, t3, t4, t5, t6, tsmall;
 	Point px1, px2, py1, py2, pz1, pz2;
-	Vector nx = Vector(1, 0, 0);
-	Vector ny = Vector(0, 1, 0);
-	Vector nz = Vector(0, 0, 1);
+	Vector nx1 = Vector(1, 0, 0);
+	Vector nx2 = Vector(-1, 0, 0);
+	Vector ny1 = Vector(0, 1, 0);
+	Vector ny2 = Vector(0, -1, 0);
+	Vector nz1 = Vector(0, 0, 1);
+	Vector nz2 = Vector(0, 0, -1);
 	Point x1 = Point(0.5, 0, 0);
 	Point x2 = Point(-0.5, 0, 0);
 	Point y1 = Point(0, 0.5, 0);
@@ -63,60 +65,93 @@ double Cube::Intersect(Point eyePointP, Vector rayV, Matrix transformMatrix) {
 	Point z1 = Point(0, 0, 0.5);
 	Point z2 = Point(0, 0, -0.5);
 
-	t1 = -(multV((eyePointP - x1), nx)) / multV(rayV, nx);
+	t1 = -(multV((eyePointP - x1), nx1)) / multV(rayV, nx1);
 	px1 = eyePointP + t1*rayV;
-	t2 = -(multV((eyePointP - x2), nx)) / multV(rayV, nx);
+	t2 = -(multV((eyePointP - x2), nx2)) / multV(rayV, nx2);
 	px2 = eyePointP + t2*rayV;
 
-	t3 = -(multV((eyePointP - y1), ny)) / multV(rayV, ny);
+	t3 = -(multV((eyePointP - y1), ny1)) / multV(rayV, ny1);
 	py1 = eyePointP + t3*rayV;
-	t4 = -(multV((eyePointP - y2), ny)) / multV(rayV, ny);
+	t4 = -(multV((eyePointP - y2), ny2)) / multV(rayV, ny2);
 	py2 = eyePointP + t4*rayV;
 
-	t5 = -(multV((eyePointP - z1), nz)) / multV(rayV, nz);
+	t5 = -(multV((eyePointP - z1), nz1)) / multV(rayV, nz1);
 	py1 = eyePointP + t5*rayV;
-	t6 = -(multV((eyePointP - z2), nz)) / multV(rayV, nz);
+	t6 = -(multV((eyePointP - z2), nz2)) / multV(rayV, nz2);
 	py2 = eyePointP + t6*rayV;
 
 	//if t3, t4 within square, else -1
 	tsmall = -1.0;
 
-	if(px1[1] < 0.5 && px1[1] > -0.5 && px1[2] < 0.5 && px1[2] > -0.5) {
+	if(px1[1] <= 0.5 && px1[1] >= -0.5 && px1[2] <= 0.5 && px1[2] >= -0.5 &&
+		isEqual(px1[0], 0.5)) {
 		tsmall = t1;
 	}
-	if(px2[1] < 0.5 && px2[1] > -0.5 && px2[2] < 0.5 && px2[2] > -0.5) {
+	if(px2[1] <= 0.5 && px2[1] >= -0.5 && px2[2] <= 0.5 && px2[2] >= -0.5 &&
+		isEqual(px2[0], -0.5)) {
 		if (tsmall != -1.0)
 			tsmall = fmin(t2, tsmall);
 		else tsmall = t2;
 	}
-	if(py1[0] < 0.5 && py1[0] > -0.5 && py1[2] < 0.5 && py1[2] > -0.5) {
-		if (tsmall != -1.0)
-			tsmall = fmin(t3, tsmall);
-		else tsmall = t3;
-	}
-	if(py2[0] < 0.5 && py2[0] > -0.5 && py2[2] < 0.5 && py2[2] > -0.5) {
-		if (tsmall != -1.0)
-			tsmall = fmin(t4, tsmall);
-		else tsmall = t4;
-	}
-	if(pz1[0] < 0.5 && pz1[0] > -0.5 && pz1[1] < 0.5 && pz1[1] > -0.5) {
-		if (tsmall != -1.0)
-			tsmall = fmin(t5, tsmall);
-		else tsmall = t5;
-	}
-	if(pz2[0] < 0.5 && pz2[0] > -0.5 && pz2[1] < 0.5 && pz2[1] > -0.5) {
-		if (tsmall != -1.0)
-			tsmall = fmin(t6, tsmall);
-		else tsmall = t6;
-	}
+	// if(py1[0] <= 0.5 && py1[0] >= -0.5 && py1[2] <= 0.5 && py1[2] >= -0.5 &&
+	// 	isEqual(py1[1], 0.5)) {
+	// 	if (tsmall != -1.0)
+	// 		tsmall = fmin(t3, tsmall);
+	// 	else tsmall = t3;
+	// }
+	// if(py2[0] <= 0.5 && py2[0] >= -0.5 && py2[2] <= 0.5 && py2[2] >= -0.5 &&
+	// 	isEqual(py2[1], -0.5)) {
+	// 	if (tsmall != -1.0)
+	// 		tsmall = fmin(t4, tsmall);
+	// 	else tsmall = t4;
+	// }
+	// if(pz1[0] <= 0.5 && pz1[0] >= -0.5 && pz1[1] <= 0.5 && pz1[1] >= -0.5 &&
+	// 	pz1[2] == 0.5) {
+	// 	if (tsmall != -1.0)
+	// 		tsmall = fmin(t5, tsmall);
+	// 	else tsmall = t5;
+	// }
+	// if(pz2[0] <= 0.5 && pz2[0] >= -0.5 && pz2[1] <= 0.5 && pz2[1] >= -0.5 &&
+	// 	pz2[2] == -0.5) {
+	// 	if (tsmall != -1.0)
+	// 		tsmall = fmin(t6, tsmall);
+	// 	else tsmall = t6;
+	// }
 
 	return tsmall;
 }
 
 Vector Cube::findIsectNormal(Point eyePoint, Vector ray, double dist){
-	return Vector();
+	Point i = eyePoint + dist * ray;
+	Vector norm = Vector(0, 0, 0);
+	//top
+	if(isEqual(i[1], 0.5)) norm = Vector(0, 1, 0);
+	//bottom
+	if(isEqual(i[1], -0.5)) norm = Vector(0, -1, 0);
+	//back
+	if(isEqual(i[0], 0.5)) norm = Vector(1, 0, 0);
+	//front
+	if(isEqual(i[0], -0.5)) norm = Vector(-1, 0, 0);
+	//left
+	if(isEqual(i[2], 0.5)) norm = Vector(0, 0, 1);
+	//right
+	if(isEqual(i[2], -0.5)) norm = Vector(0, 0, -1);
+
+	// Point origin =  Point(0, 0, 0);
+	// Vector norm = i - origin;
+	norm.normalize();
+	
+	return norm;
 }
 
+static bool isEqual(double i, double j) {
+
+	if (abs(i - j) < eps) {
+		return true;
+	} else {
+		return false;
+	}
+}
 
 static double multV(Vector v1, Vector v2) {
 
