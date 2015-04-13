@@ -11,9 +11,9 @@ Camera::~Camera() {
 
 void Camera::Reset() {
 	//default position????
-	SetViewAngle(3200);
+	SetViewAngle(45);
 	Point theP = Point(0, 0, 0);
-	Vector lVec = Vector(0, 0, 0);
+	Vector lVec = Vector(0, 0, -1);
 	Vector uVec = Vector(0, 1, 0);
 	Orient(theP, lVec, uVec);
 
@@ -32,11 +32,11 @@ Vector Camera::getU(){
 
 }
 
+
+
 void Camera::Orient(Point& eye, Point& focus, Vector& up) {
 
-	Vector look = Vector(focus[0] - eye[0],
-							focus[1] - eye[1],
-							focus[2] - eye[2]);
+	Vector look = focus - eye;
 
 	look.normalize();
 
@@ -46,6 +46,8 @@ void Camera::Orient(Point& eye, Point& focus, Vector& up) {
 
 
 void Camera::Orient(Point& eye, Vector& look, Vector& up) {
+	
+	SetViewAngle(45);
 
 	this -> eyePoint = eye;
 	this -> upVector = up;
