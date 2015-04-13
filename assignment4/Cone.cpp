@@ -40,54 +40,56 @@ double Cone::Intersect(Point eyePointP, Vector rayV, Matrix transformMatrix) {
 	double r = 0.5;
 
 	double A, B, C, t1, t2, t4, tsmall;
-	Point p2;
-	Vector n = Vector(1, 0, 0);
-	Point x2 = Point(-0.5, 0, 0);
+	Point p2, p1, p4;
+	Vector n = Vector(0, -1.0, 0);
+	Point y2 = Point(0, -0.5, 0);
 
 	A = rayV[0]*rayV[0] + rayV[2]*rayV[2] - rayV[1]*rayV[1]*r*r;
 	B = 2 * (rayV[0]*eyePointP[0] + rayV[2]*eyePointP[2] - rayV[1]*eyePointP[1]*r*r)
-			- rayV[1]*r*r;
+			+ rayV[1]*r*r;
 	C = eyePointP[0]*eyePointP[0] + eyePointP[2]*eyePointP[2] - 
-		(.25 + eyePointP[1] + eyePointP[1]*eyePointP[1])*r*r;
+		(.25 - eyePointP[1] + eyePointP[1]*eyePointP[1])*r*r;
 
 	double check = B*B - 4*A*C;
 
-	t4 = -(multV((eyePointP - x2), n)) / multV(rayV, n);
-	p2 = eyePointP + t4*rayV;
-
-	if (check < 0) {
-		if (p2[0]*p2[0] + p2[2]*p2[2] < r*r) {
-			return t4;
-		}
-		else return -1.0;
+	if (check >= 0) {
+		t1 = ((-B) + sqrt(check)) / (2*A);
+		p1 = eyePointP + t1*rayV;
+		t2 = ((-B) - sqrt(check)) / (2*A);	
+		p2 = eyePointP + t2*rayV;
+		if (p1[1] < -0.5 || p1[1] > 0.5) t1 = -1.0;
+		if (p2[1] < -0.5 || p2[1] > 0.5) t2 = -1.0;
 	}
 
-	t1 = ((-B) + sqrt(check)) / (2*A);
-	t2 = ((-B) - sqrt(check)) / (2*A);
+	t4 = -(multV((eyePointP - y2), n)) / multV(rayV, n);
+	p4 = eyePointP + t4*rayV;
 	
-
-	//if t3, t4 within circle, else -1
-	//check p1[1] should be .5
-	if (p2[0]*p2[0] + p2[2]*p2[2] < r*r) {
-		tsmall = t4;
+	if ((p4[0]*p4[0] + p4[2]*p4[2] < r*r) && p4[1] > -0.5 && p4[1] < 0.5) {
+			//printf("hereeee");
+			if (check >= 0)
+				return fmin(t4, fmin(t1, t2));
+			else return t4;
 	}
+	
+	if(check >= 0) return fmin(t1, t2);
+	else return -1.0;
 
 
 
 
 
-	if(tsmall > 0) 
-		t = fmin(tsmall, fmin(t1, t2));
-	else
-		t =  fmin(t1, t2);
+	// if(tsmall > 0) 
+	// 	t = fmin(tsmall, fmin(t1, t2));
+	// else
+	// 	t =  fmin(t1, t2);
 
-	Point i = eyePointP + t * rayV;
-	if ((i[1] < -0.5) || (i[1] > 0.5)) {
-		return -1.0;
-	}
-	else { 
-		return t;
-	}
+	// Point i = eyePointP + t * rayV;
+	// if ((i[1] < -0.5) || (i[1] > 0.5)) {
+	// 	return -1.0;
+	// }
+	// else { 
+	// 	return t;
+	// }
 	
 }
 
