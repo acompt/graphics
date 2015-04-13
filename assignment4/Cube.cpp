@@ -93,12 +93,12 @@ double Cube::Intersect(Point eyePointP, Vector rayV, Matrix transformMatrix) {
 			tsmall = fmin(t2, tsmall);
 		else tsmall = t2;
 	}
-	// if(py1[0] <= 0.5 && py1[0] >= -0.5 && py1[2] <= 0.5 && py1[2] >= -0.5 &&
-	// 	isEqual(py1[1], 0.5)) {
-	// 	if (tsmall != -1.0)
-	// 		tsmall = fmin(t3, tsmall);
-	// 	else tsmall = t3;
-	// }
+	if(py1[0] <= 0.5 && py1[0] >= -0.5 && py1[2] <= 0.5 && py1[2] >= -0.5 &&
+		isEqual(py1[1], 0.5)) {
+		if (tsmall != -1.0)
+			tsmall = fmin(t3, tsmall);
+		else tsmall = t3;
+	}
 	// if(py2[0] <= 0.5 && py2[0] >= -0.5 && py2[2] <= 0.5 && py2[2] >= -0.5 &&
 	// 	isEqual(py2[1], -0.5)) {
 	// 	if (tsmall != -1.0)

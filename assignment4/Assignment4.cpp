@@ -48,7 +48,7 @@ Vector getShapeSpecNormal(objNode* iter, Vector ray, double t);
 
 /** These are GLUI control panel objects ***/
 int  main_window;
-string filenamePath = "data/general/unit_sphere.xml";
+string filenamePath = "data/general/unit_cylinder.xml";
 GLUI_EditText* filenameTextField = NULL;
 GLubyte* pixels = NULL;
 
@@ -183,7 +183,6 @@ Vector generateRay(int pixelX, int pixelY) {
 
 void callback_start(int id) {
 
-	printf("LookX: %f\n", lookX);
 
 	cout << "start button clicked!" << endl;
 
@@ -290,6 +289,7 @@ double getShapeSpecIntersect(objNode* iter, Vector ray, int x, int y){
 
 	// }
 
+		printf("t: %f\n", t);
 		return t;
 
 }

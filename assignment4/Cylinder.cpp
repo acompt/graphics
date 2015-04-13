@@ -18,7 +18,7 @@ File name: Cylinder.cpp
 #include <unistd.h> 
 
 #define edge_length 1
-#define eps 0.00001
+#define eps 0.001
 
 #define NEG -0.5
 #define POS 0.5
@@ -27,6 +27,8 @@ File name: Cylinder.cpp
 static double multP(Point p1, Point p2);
 static double multV(Vector v1, Vector v2);
 static double multPV(Point p, Vector v);
+static bool isEqual(double i, double j);
+
 
 Cylinder::Cylinder() {
 	faceList = new FaceList;
@@ -39,10 +41,11 @@ double Cylinder::Intersect(Point eyePointP, Vector rayV, Matrix transformMatrix)
 	double r = 0.5;
 
 	double A, B, C, t1, t2, t3, t4, tsmall;
-	Point p1, p2;
-	Vector n = Vector(1, 0, 0);
-	Point x1 = Point(0.5, 0, 0);
-	Point x2 = Point(-0.5, 0, 0);
+	Point p1, p2, p1a, p2a;
+	Vector n_top = Vector(0, 1, 0);
+	Vector n_bot = Vector(0, -1, 0);
+	Point p_top = Point(0, 0.5, 0);
+	Point p_bot = Point(0, -0.5, 0);
 
 	A = rayV[0]*rayV[0] + rayV[2]*rayV[2];
 	B = 2 * (rayV[0]*eyePointP[0] + rayV[2]*eyePointP[2]);
@@ -56,9 +59,9 @@ double Cylinder::Intersect(Point eyePointP, Vector rayV, Matrix transformMatrix)
 	}
 
 	
-	t3 = -(multV((eyePointP - x1), n)) / multV(rayV, n);
+	t3 = -(multV((eyePointP - p_top), n_top)) / multV(rayV, n_top);
 	p1 = eyePointP + t3*rayV;
-	t4 = -(multV((eyePointP - x2), n)) / multV(rayV, n);
+	t4 = -(multV((eyePointP - p_bot), n_bot)) / multV(rayV, n_bot);
 	p2 = eyePointP + t4*rayV;
 
 	//if t3, t4 within circle, else -1
@@ -74,15 +77,70 @@ double Cylinder::Intersect(Point eyePointP, Vector rayV, Matrix transformMatrix)
 
 	if (check < 0) return tsmall;
 
-	if(tsmall > 0) 
-		return fmin(tsmall, fmin(t1, t2));
-	else
-		return fmin(t1, t2);
+
+
+	p1a = eyePointP + t1*rayV;
+	p2a = eyePointP + t2*rayV;
+
+	bool p1a_in = ((p1a[1] < 0.5) && (p1a[1] > -0.5));
+	bool p2a_in = ((p2a[1] < 0.5) && (p2a[1] > -0.5));
+
+	if (p1a_in && p2a_in) {
+		if(tsmall > 0) 
+			t = fmin(tsmall, fmin(t1, t2));
+		else
+			t = fmin(t1, t2);
+	} else if (p1a_in) {
+		if(tsmall > 0) 
+			t = fmin(tsmall, t1);
+		else
+			t = t1; 
+	} else if (p2a_in) {
+		if(tsmall > 0) 
+			t = fmin(tsmall, t2);
+		else
+			t = t2; 
+	}
+
+	return t;
 }
 
 Vector Cylinder::findIsectNormal(Point eyePoint, Vector ray, double dist){
-	return Vector();
+
+	Point i = eyePoint + dist * ray;
+
+	double y_top = 0.5;
+	double y_bot = -0.5;
+
+	if (isEqual(i[1], y_bot)) {
+		//is on the bottom
+		return Vector (0, -1, 0);
+
+	} 
+	else if (isEqual(i[1], y_top)) {
+		//is on the top
+		return Vector (0, 1, 0);
+	}
+	else {
+
+		Point s = Point(0, i[1], 0);
+		Vector norm = s - i;
+
+		norm.normalize();
+		return norm;
+	}
+
 }
+
+static bool isEqual(double i, double j) {
+
+	if (abs(i - j) < eps) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
 
 static double multP(Point p1, Point p2){
 
