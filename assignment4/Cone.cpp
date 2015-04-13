@@ -72,25 +72,47 @@ double Cone::Intersect(Point eyePointP, Vector rayV, Matrix transformMatrix) {
 		tsmall = t4;
 	}
 
+
+
+
+
 	if(tsmall > 0) 
-		return fmin(tsmall, fmin(t1, t2));
+		t = fmin(tsmall, fmin(t1, t2));
 	else
-		return fmin(t1, t2);
+		t =  fmin(t1, t2);
+
+	Point i = eyePointP + t * rayV;
+	if ((i[1] < -0.5) || (i[1] > 0.5)) {
+		return -1.0;
+	}
+	else { 
+		return t;
+	}
+	
 }
 
 Vector Cone::findIsectNormal(Point eyePoint, Vector ray, double dist){
 
 
 	Point i = eyePoint + dist * ray;
-	Point origin =  Point(0, 0, 0);
+	double y_bot = -0.5;
 
+	if ( isEqual(i[1], y_bot)) {
+		//is on the bottom
+		return Vector (0, -1, 0);
 
+	} else {
 
+		Point s = Point(0, i[1], 0);
 
+		Vector xz_comp = s - i;
 
+		double y0 = 0.5 * xz_comp.length();
 
-
-
+		Vector norm = Vector(xz_comp[0], y0, xz_comp[2]);
+		norm.normalize();
+		return norm;
+	}
 }
 
 bool isEqual(double i, double j) {
