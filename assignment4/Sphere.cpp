@@ -55,14 +55,13 @@ double Sphere::Intersect(Point eyePointP, Vector rayV, Matrix transformMatrix) {
 
 	double check = B*B - 4*A*C;
 
-	if (check < 0) {
-		return -1;
+	if (check >= 0) {
+		t1 = ((-B) + sqrt(check)) / (2*A);
+		t2 = ((-B) - sqrt(check)) / (2*A);
+		t = fmin(t1, t2);
 	}
 
-	t1 = ((-B) + sqrt(check)) / (2*A);
-	t2 = ((-B) - sqrt(check)) / (2*A);
-
-	return fmin(t1, t2);
+	return t;
 
 
 
@@ -115,14 +114,10 @@ static double multV(Vector v1, Vector v2) {
 
 Vector Sphere::findIsectNormal(Point eyePoint, Vector ray, double dist){
 	Point i = eyePoint + dist * ray;
-
 	Point origin =  Point(0, 0, 0);
-
 	Vector norm = i - origin;
-
 	norm.normalize();
 	
-
 	return norm;
 }
 
