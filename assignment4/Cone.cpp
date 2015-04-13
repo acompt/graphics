@@ -95,7 +95,7 @@ Vector Cone::findIsectNormal(Point eyePoint, Vector ray, double dist){
 
 bool isEqual(double i, double j) {
 
-	if ((abs(i - j) < eps) {
+	if (abs(i - j) < eps) {
 		return true;
 	} else {
 		return false;
