@@ -238,25 +238,25 @@ void callback_start(int id) {
 
 double getShapeSpecIntersect(objNode* iter, Vector ray, int x, int y){
 
-	Point eP = camera->GetEyePoint();
-	Matrix m = iter->tMat;
+	Point ep = camera->GetEyePoint();
+	Matrix m = iter->tMat; // Transformation FROM object TO world
 
 	if (iter->type == SHAPE_CUBE) {
-		return cube->Intersect(eP, ray, m);
+		return cube->Intersect(ep, ray, m);
 	}
 	else if (iter->type == SHAPE_CYLINDER) {
 		if ((y > -0.5) && (y < 0.5))
-			return cylinder->Intersect(eP, ray, m);
+			return cylinder->Intersect(ep, ray, m);
 		else
 			return -1.0;
 	}
 	else if (iter->type == SHAPE_CONE){
 		if ((y > -0.5) && (y < 0.5))
-			return cone->Intersect(eP, ray, m);
+			return cone->Intersect(ep, ray, m);
 		else
 			return -1.0;
 	}else if (iter->type == SHAPE_SPHERE){
-		return sphere->Intersect(eP, ray, m);
+		return sphere->Intersect(ep, ray, m);
 	} else {
 		return -1.0;
 	}
@@ -264,18 +264,26 @@ double getShapeSpecIntersect(objNode* iter, Vector ray, int x, int y){
 }
 
 Vector getShapeSpecNormal(objNode* iter, Vector ray, double t){
-	Point eP = camera->GetEyePoint();
+	Point ep = camera->GetEyePoint();
+	Matrix m = iter->tMat; // Transformation FROM object TO world
+
+	Matrix inv = invert(m);
+
+	Point ep_obj = inv * ep;
+	Vector ray_obj = inv * ray;
+
+	
 
 	if (iter->type == SHAPE_CUBE) {
-		return cube->findIsectNormal(eP, ray, t);
+		return cube->findIsectNormal(ep_obj, ray_obj, t);
 	}
 	else if (iter->type == SHAPE_CYLINDER) {
-		return cylinder->findIsectNormal(eP, ray, t);
+		return cylinder->findIsectNormal(ep_obj, ray_obj, t);
 	}
 	else if (iter->type == SHAPE_CONE){
-		return cone->findIsectNormal(eP, ray, t);
+		return cone->findIsectNormal(ep_obj, ray_obj, t);
 	}else if (iter->type == SHAPE_SPHERE){
-		return sphere->findIsectNormal(eP, ray, t);
+		return sphere->findIsectNormal(ep_obj, ray_obj, t);
 	} else {
 		return Vector();
 		// ERROR MESSAGE?
