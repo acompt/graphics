@@ -11,7 +11,7 @@ Camera::~Camera() {
 
 void Camera::Reset() {
 
-	SetViewAngle(45);
+	SetViewAngle(30);
 	Point theP = Point(0, 0, 0);
 	Vector lVec = Vector(0, 0, -1);
 	Vector uVec = Vector(0, 1, 0);

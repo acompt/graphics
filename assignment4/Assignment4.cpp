@@ -28,7 +28,7 @@ int  isectOnly = 1;
 int	 camRotU = 0;
 int	 camRotV = 0;
 int	 camRotW = 0;
-int  viewAngle = 45;
+int  viewAngle = 30;
 float eyeX = 2;
 float eyeY = 2;
 float eyeZ = 2;
@@ -48,7 +48,7 @@ Vector getShapeSpecNormal(objNode* iter, Vector ray, double t);
 
 /** These are GLUI control panel objects ***/
 int  main_window;
-string filenamePath = "data/general/unit_cylinder.xml";
+string filenamePath = "data/general/robot.xml";
 GLUI_EditText* filenameTextField = NULL;
 GLubyte* pixels = NULL;
 
@@ -221,10 +221,9 @@ void callback_start(int id) {
 
 			while (iter != NULL) {
 
-
 				t = getShapeSpecIntersect(iter, ray, i, j);
 
-				if ((smallest_t == -1.0) || (t < smallest_t)) {
+				if (((smallest_t == -1.0) && (t > 0)) || ((t > 0) && (t < smallest_t))) {
 					smallest_t = t;
 					norm = getShapeSpecNormal(iter, ray, smallest_t);
 					theObj = iter;
@@ -279,17 +278,6 @@ double getShapeSpecIntersect(objNode* iter, Vector ray, int x, int y){
 		t = -1.0;
 	}
 
-	// if ((x == windowXSize/2) && (y == windowYSize/2)) {
-
-	// 	printf("x: %d, y: %d\n", x, y);
-	// 	printf("ray: (%f, %f, %f.\n", ray[0], ray[1], ray[2]);
-	// 	printf("t: %f.\n", t);
-	// 	printf("Eye point: %f, %f, %f.\n", ep[0], ep[1], ep[2]);
-	// 	printf("ep_obj: %f, %f, %f.\n", ep_obj[0], ep_obj[1], ep_obj[2]);
-
-	// }
-
-		printf("t: %f\n", t);
 		return t;
 
 }
@@ -392,7 +380,7 @@ void putPixel(int i, int j, double smallest_t, Vector norm, objNode* obj, Point 
 	// blueInt = round(blue);
 
 
-	// printf("pixel, (%d, %d): r: %d g: %d b:%d \n", i, j, redInt, greenInt, blueInt );
+	printf("pixel, (%d, %d): r: %d g: %d b:%d \n", i, j, redInt, greenInt, blueInt );
 	setPixel(pixels, i, j, redInt, greenInt, blueInt);
 
 }
