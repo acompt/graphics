@@ -114,7 +114,16 @@ static double multV(Vector v1, Vector v2) {
 }
 
 Vector Sphere::findIsectNormal(Point eyePoint, Vector ray, double dist){
-	return Vector();
+	Point i = eyePoint + dist * ray;
+
+	Point origin =  Point(0, 0, 0);
+
+	Vector norm = i - origin;
+
+	norm.normalize();
+	
+
+	return norm;
 }
 
 void Sphere::draw() {
