@@ -48,7 +48,7 @@ Vector getShapeSpecNormal(objNode* iter, Vector ray, double t);
 
 /** These are GLUI control panel objects ***/
 int  main_window;
-string filenamePath = "data/general/unit_cube.xml";
+string filenamePath = "data/general/test.xml";
 GLUI_EditText* filenameTextField = NULL;
 GLubyte* pixels = NULL;
 
@@ -84,8 +84,12 @@ void addObject(SceneNode* node, Matrix curMat) {
 	Matrix toMult;
 	Vector v;
 	int transforms = node->transformations.size();
+
+	toMult = Matrix();
 	for(int i = 0; i < transforms; i++) {
 		TransformationType type = node->transformations[i]->type;
+
+
 
 		if (type == TRANSFORMATION_TRANSLATE){
 
@@ -100,11 +104,11 @@ void addObject(SceneNode* node, Matrix curMat) {
 			v = node->transformations[i]->rotate;
 			float angle = node->transformations[i]->angle;
 
-			Matrix toMult = rot_mat(v, angle);
+			toMult = rot_mat(v, angle);
 
 		} else if (type == TRANSFORMATION_MATRIX) {
 
-			Matrix toMult = node->transformations[i]->matrix;
+			toMult = node->transformations[i]->matrix;
 		}	
 		curMat = toMult * curMat;
 	}
@@ -281,18 +285,11 @@ double getShapeSpecIntersect(objNode* iter, Vector ray, int x, int y){
 		t = -1.0;
 	}
 
-	// if ((x == windowXSize/2) && (y == windowYSize/2)) {
-
-	// 	printf("x: %d, y: %d\n", x, y);
-	// 	printf("ray: (%f, %f, %f.\n", ray[0], ray[1], ray[2]);
-	// 	printf("t: %f.\n", t);
-	// 	printf("Eye point: %f, %f, %f.\n", ep[0], ep[1], ep[2]);
-	// 	printf("ep_obj: %f, %f, %f.\n", ep_obj[0], ep_obj[1], ep_obj[2]);
-
-	// }
-
-		//printf("t: %f\n", t);
-		return t;
+	Point p_obj = ep_obj + ray_obj * t;
+	Point p_world = m * p_obj;
+	Vector dist_world = p_world - ep;
+	double toReturn = dist_world.length();
+	return toReturn;
 
 }
 
@@ -305,22 +302,34 @@ Vector getShapeSpecNormal(objNode* iter, Vector ray, double t){
 	Point ep_obj = inv * ep;
 	Vector ray_obj = inv * ray;
 
+	Matrix hgn = transpose(m);
+	Vector toR, toRR;
 
 
 	if (iter->type == SHAPE_CUBE) {
-		return cube->findIsectNormal(ep_obj, ray_obj, t);
+
+		toR = cube->findIsectNormal(ep_obj, ray_obj, t);
 	}
 	else if (iter->type == SHAPE_CYLINDER) {
-		return cylinder->findIsectNormal(ep_obj, ray_obj, t);
+
+		toR = cylinder->findIsectNormal(ep_obj, ray_obj, t);
 	}
 	else if (iter->type == SHAPE_CONE){
-		return cone->findIsectNormal(ep_obj, ray_obj, t);
-	}else if (iter->type == SHAPE_SPHERE){
-		return sphere->findIsectNormal(ep_obj, ray_obj, t);
-	} else {
+
+		toR =  cone->findIsectNormal(ep_obj, ray_obj, t);
+	}
+	else if (iter->type == SHAPE_SPHERE){
+
+		toR = sphere->findIsectNormal(ep_obj, ray_obj, t);
+	} 
+	else {
 		return Vector();
 		// ERROR MESSAGE?
 	}
+
+	toRR = hgn * toR;
+	return toRR;
+
 }
 
 void putPixel(int i, int j, double smallest_t, Vector norm, objNode* obj, Point worldcord) {
