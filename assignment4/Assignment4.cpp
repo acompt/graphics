@@ -48,10 +48,7 @@ Vector getShapeSpecNormal(objNode* iter, Vector ray, double t);
 
 /** These are GLUI control panel objects ***/
 int  main_window;
-
-string filenamePath = "data/general/test.xml";
-//string filenamePath = "piel.xml";
-
+string filenamePath = "data/general/unit_cube.xml";
 GLUI_EditText* filenameTextField = NULL;
 GLubyte* pixels = NULL;
 
@@ -77,25 +74,8 @@ void createObjList(SceneNode* root) {
 	addObject(root, idMat);
 }
 
-void deleteObjList(objNode* root) {
-
-	objNode* iter = root;
-
-	while (iter != NULL) {
-		root = iter;
-		iter = iter -> next;
-		delete root;
-	}
-}
-
 
 void addObject(SceneNode* node, Matrix curMat) {
-
-	// TO DELETE
-	printf("Reading a node with %d transforms, %d primitives and %d children.\n",
-		(node->transformations).size(),
-		(node->primitives).size(),
-		(node->children).size());
 
 	if (node == NULL) {
 		return;
@@ -107,12 +87,9 @@ void addObject(SceneNode* node, Matrix curMat) {
 	for(int i = 0; i < transforms; i++) {
 		TransformationType type = node->transformations[i]->type;
 
-		toMult = Matrix();
-
 		if (type == TRANSFORMATION_TRANSLATE){
 
 			v = node->transformations[i]->translate;
-
 			toMult = trans_mat(v);
 
 		} else if (type == TRANSFORMATION_SCALE) {
@@ -128,11 +105,8 @@ void addObject(SceneNode* node, Matrix curMat) {
 		} else if (type == TRANSFORMATION_MATRIX) {
 
 			Matrix toMult = node->transformations[i]->matrix;
-		}
-
+		}	
 		curMat = toMult * curMat;
-
-
 	}
 
 	int primitives = node->primitives.size();
@@ -245,7 +219,7 @@ void callback_start(int id) {
 			Vector norm;
 			objNode* theObj = NULL;
 
-			while (iter != NULL) {				
+			while (iter != NULL) {
 
 				t = getShapeSpecIntersect(iter, ray, i, j);
 
@@ -253,13 +227,16 @@ void callback_start(int id) {
 					smallest_t = t;
 					norm = getShapeSpecNormal(iter, ray, smallest_t);
 					theObj = iter;
+					
+					worldcord = camera->GetEyePoint() + smallest_t * ray;
+					worldcord = iter->tMat * worldcord;
 				}
 
 				iter = iter->next;
 			}
 
 
-			worldcord = camera->GetEyePoint() + smallest_t * ray;
+			//worldcord = camera->GetEyePoint() + smallest_t * ray;
 			putPixel(i, j, smallest_t, norm, theObj, worldcord);
 
 		}
@@ -304,6 +281,17 @@ double getShapeSpecIntersect(objNode* iter, Vector ray, int x, int y){
 		t = -1.0;
 	}
 
+	// if ((x == windowXSize/2) && (y == windowYSize/2)) {
+
+	// 	printf("x: %d, y: %d\n", x, y);
+	// 	printf("ray: (%f, %f, %f.\n", ray[0], ray[1], ray[2]);
+	// 	printf("t: %f.\n", t);
+	// 	printf("Eye point: %f, %f, %f.\n", ep[0], ep[1], ep[2]);
+	// 	printf("ep_obj: %f, %f, %f.\n", ep_obj[0], ep_obj[1], ep_obj[2]);
+
+	// }
+
+		//printf("t: %f\n", t);
 		return t;
 
 }
@@ -539,8 +527,6 @@ void onExit()
 	if (pixels != NULL) {
 		delete pixels;
 	}
-	deleteObjList(head);
-
 }
 
 /**************************************** main() ********************/
@@ -594,27 +580,6 @@ int main(int argc, char* argv[])
 	eyez_widget->set_float_limits(-10, 10);
 
 	GLUI_Spinner* lookx_widget = glui->add_spinner_to_panel(camera_panel, "LookX:", GLUI_SPINNER_FLOAT, &lookX);
-	lookx_widget->set_float_limits(-10, 10);
-	GLUI_Spinner* looky_widget = glui->add_spinner_to_panel(camera_panel, "LookY:", GLUI_SPINNER_FLOAT, &lookY);
-	looky_widget->set_float_limits(-10, 10);
-	GLUI_Spinner* lookz_widget = glui->add_spinner_to_panel(camera_panel, "LookZ:", GLUI_SPINNER_FLOAT, &lookZ);
-	lookz_widget->set_float_limits(-10, 10);
-
-	glui->add_button("Quit", 0, (GLUI_Update_CB)exit);
-
-	glui->set_main_gfx_window(main_window);
-
-	/* We register the idle callback with GLUI, *not* with GLUT */
-	GLUI_Master.set_glutIdleFunc(myGlutIdle);
-
-	glutMainLoop();
-
-	return EXIT_SUCCESS;
-}
-
-
-
-, "LookX:", GLUI_SPINNER_FLOAT, &lookX);
 	lookx_widget->set_float_limits(-10, 10);
 	GLUI_Spinner* looky_widget = glui->add_spinner_to_panel(camera_panel, "LookY:", GLUI_SPINNER_FLOAT, &lookY);
 	looky_widget->set_float_limits(-10, 10);
