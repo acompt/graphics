@@ -614,3 +614,24 @@ int main(int argc, char* argv[])
 
 
 
+, "LookX:", GLUI_SPINNER_FLOAT, &lookX);
+	lookx_widget->set_float_limits(-10, 10);
+	GLUI_Spinner* looky_widget = glui->add_spinner_to_panel(camera_panel, "LookY:", GLUI_SPINNER_FLOAT, &lookY);
+	looky_widget->set_float_limits(-10, 10);
+	GLUI_Spinner* lookz_widget = glui->add_spinner_to_panel(camera_panel, "LookZ:", GLUI_SPINNER_FLOAT, &lookZ);
+	lookz_widget->set_float_limits(-10, 10);
+
+	glui->add_button("Quit", 0, (GLUI_Update_CB)exit);
+
+	glui->set_main_gfx_window(main_window);
+
+	/* We register the idle callback with GLUI, *not* with GLUT */
+	GLUI_Master.set_glutIdleFunc(myGlutIdle);
+
+	glutMainLoop();
+
+	return EXIT_SUCCESS;
+}
+
+
+

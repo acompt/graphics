@@ -76,9 +76,9 @@ double Cube::Intersect(Point eyePointP, Vector rayV, Matrix transformMatrix) {
 	py2 = eyePointP + t4*rayV;
 
 	t5 = -(multV((eyePointP - z1), nz1)) / multV(rayV, nz1);
-	py1 = eyePointP + t5*rayV;
+	pz1 = eyePointP + t5*rayV;
 	t6 = -(multV((eyePointP - z2), nz2)) / multV(rayV, nz2);
-	py2 = eyePointP + t6*rayV;
+	pz2 = eyePointP + t6*rayV;
 
 	//if t3, t4 within square, else -1
 	tsmall = -1.0;
@@ -93,30 +93,28 @@ double Cube::Intersect(Point eyePointP, Vector rayV, Matrix transformMatrix) {
 			tsmall = fmin(t2, tsmall);
 		else tsmall = t2;
 	}
-	if(py1[0] <= 0.5 && py1[0] >= -0.5 && py1[2] <= 0.5 && py1[2] >= -0.5 &&
-		isEqual(py1[1], 0.5)) {
+	if(py1[0] <= 0.5 && py1[0] >= -0.5 && py1[2] <= 0.5 && py1[2] >= -0.5) {
 		if (tsmall != -1.0)
 			tsmall = fmin(t3, tsmall);
 		else tsmall = t3;
 	}
-	// if(py2[0] <= 0.5 && py2[0] >= -0.5 && py2[2] <= 0.5 && py2[2] >= -0.5 &&
-	// 	isEqual(py2[1], -0.5)) {
-	// 	if (tsmall != -1.0)
-	// 		tsmall = fmin(t4, tsmall);
-	// 	else tsmall = t4;
-	// }
-	// if(pz1[0] <= 0.5 && pz1[0] >= -0.5 && pz1[1] <= 0.5 && pz1[1] >= -0.5 &&
-	// 	pz1[2] == 0.5) {
-	// 	if (tsmall != -1.0)
-	// 		tsmall = fmin(t5, tsmall);
-	// 	else tsmall = t5;
-	// }
-	// if(pz2[0] <= 0.5 && pz2[0] >= -0.5 && pz2[1] <= 0.5 && pz2[1] >= -0.5 &&
-	// 	pz2[2] == -0.5) {
-	// 	if (tsmall != -1.0)
-	// 		tsmall = fmin(t6, tsmall);
-	// 	else tsmall = t6;
-	// }
+	if(py2[0] <= 0.5 && py2[0] >= -0.5 && py2[2] <= 0.5 && py2[2] >= -0.5){ 
+		if (tsmall != -1.0)
+			tsmall = fmin(t4, tsmall);
+		else tsmall = t4;
+	}
+	if(pz1[0] <= 0.5 && pz1[0] >= -0.5 && pz1[1] <= 0.5 && pz1[1] >= -0.5 &&
+		isEqual(pz1[2], 0.5)) {
+		if (tsmall != -1.0)
+			tsmall = fmin(t5, tsmall);
+		else tsmall = t5;
+	}
+	if(pz2[0] <= 0.5 && pz2[0] >= -0.5 && pz2[1] <= 0.5 && pz2[1] >= -0.5 &&
+		isEqual(pz2[2], -0.5)) {
+		if (tsmall != -1.0)
+			tsmall = fmin(t6, tsmall);
+		else tsmall = t6;
+	}
 
 	return tsmall;
 }
