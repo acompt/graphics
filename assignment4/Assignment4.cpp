@@ -15,9 +15,17 @@
 
 using namespace std;
 
+struct MatList {
+	Matrix T;
+	Matrix S;
+	Matrix R;
+	Matrix Z;
+	Matrix M;
+};
+
 struct objNode {
 	PrimitiveType type;
-	Matrix tMat;
+	MatList ml;
 	SceneMaterial material;
 	objNode* next;
 };
@@ -40,8 +48,10 @@ float lookZ = -2;
 double windowXSize = 500;
 double windowYSize = 500;
 
-void storeObj(PrimitiveType n_type, Matrix n_tMat, SceneMaterial n_material);
-void addObject(SceneNode* node, Matrix curMat);
+
+
+void storeObj(PrimitiveType n_type, MatList ml, SceneMaterial n_material);
+void addObject(SceneNode* node, MatList curMat);
 double getShapeSpecIntersect(objNode* iter, Vector ray, int x, int y);
 void putPixel(int i, int j, double smallest_t, Vector norm, objNode* obj, Point worldcord);
 Vector getShapeSpecNormal(objNode* iter, Vector ray, double t);
@@ -66,52 +76,92 @@ Camera* camera = new Camera();
 objNode* head;
 objNode* tail;
 
+
+
 void createObjList(SceneNode* root) {
 
-	Matrix idMat = Matrix();
+	MatList idMat;
+
+	idMat.T = Matrix();
+	idMat.S = Matrix();
+	idMat.R = Matrix();
+	idMat.Z = Matrix();
+	idMat.M = Matrix();
+
 	head = NULL;
 	tail = NULL;
+
 	addObject(root, idMat);
+
+	// objNode* cur = head;
+
+	// while (cur != NULL) {
+
+	// 	printf("primitive no: %d", cur->type);
+	// 	Matrix M = cur -> tMat;
+
+	// 	printf("Matrix is:\n %f, %f, %f, %f\n %f, %f, %f, %f \n %f, %f, %f, %f \n %f, %f, %f, %f, \n",
+	// 					M[0], M[4], M[8], M[12],
+	// 					M[1], M[5], M[9], M[13], 
+	// 					M[2], M[6], M[10], M[14],
+	// 					M[3], M[7], M[11], M[15]);
+
+	// 	cur = cur -> next;
+	// }
 }
 
 
-void addObject(SceneNode* node, Matrix curMat) {
+void addObject(SceneNode* node, MatList curMat) {
 
 	if (node == NULL) {
 		return;
 	}
 
-	Matrix toMult;
-	Vector v;
-	int transforms = node->transformations.size();
+	Matrix transLM = Matrix();
+	Matrix scaleM = Matrix();
+	Matrix rotM = Matrix();
+	Matrix transFM = Matrix();
 
-	toMult = Matrix();
+	Matrix newM = Matrix();
+
+	int transforms = 0;
+	Vector v;
+	transforms = node->transformations.size();
+
 	for(int i = 0; i < transforms; i++) {
 		TransformationType type = node->transformations[i]->type;
-
 
 
 		if (type == TRANSFORMATION_TRANSLATE){
 
 			v = node->transformations[i]->translate;
-			toMult = trans_mat(v);
+			transLM = trans_mat(v) * transLM;
 
 		} else if (type == TRANSFORMATION_SCALE) {
 			v = node->transformations[i]->scale;
-			toMult = scale_mat(v);
+			scaleM = scale_mat(v) * scaleM;
 
 		} else if (type == TRANSFORMATION_ROTATE) {
 			v = node->transformations[i]->rotate;
 			float angle = node->transformations[i]->angle;
 
-			toMult = rot_mat(v, angle);
+			rotM = rot_mat(v, angle) * rotM;
 
 		} else if (type == TRANSFORMATION_MATRIX) {
 
-			toMult = node->transformations[i]->matrix;
+			transFM = node->transformations[i]->matrix * transFM;
 		}	
-		curMat = toMult * curMat;
+
 	}
+
+	// curMat.S = scaleM * curMat.S;
+	// curMat.R = rotM * curMat.R;
+	// curMat.T = transLM * curMat.T;
+	// curMat.Z = transFM * curMat.Z;
+
+	newM = transFM * transLM * rotM * scaleM;
+
+	curMat.M = curMat.M * newM;
 
 	int primitives = node->primitives.size();
 
@@ -127,12 +177,12 @@ void addObject(SceneNode* node, Matrix curMat) {
 	}
 }
 
-void storeObj(PrimitiveType n_type, Matrix n_tMat, SceneMaterial n_material) {
+void storeObj(PrimitiveType n_type, MatList n_ml, SceneMaterial n_material) {
 
 	objNode* newNode = new objNode();
 
 	newNode -> type = n_type;
-	newNode -> tMat = n_tMat;
+	newNode -> ml = n_ml;
 	newNode -> material = n_material;
 	newNode -> next = NULL;
 
@@ -181,6 +231,10 @@ Vector generateRay(int pixelX, int pixelY) {
 	ray = s - camera->GetEyePoint();
 
 	ray.normalize();
+
+	// printf("x,y: %d %d\n", pixelX, pixelY);
+	// printf("Cast Ray: %f %f %f\n", ray[0], ray[1], ray[2]);
+
 
 	return ray;
 }
@@ -233,15 +287,15 @@ void callback_start(int id) {
 					theObj = iter;
 					
 					worldcord = camera->GetEyePoint() + smallest_t * ray;
-					worldcord = iter->tMat * worldcord;
+					worldcord = iter->ml.M * worldcord;
 				}
 
 				iter = iter->next;
 			}
 
 
-			//worldcord = camera->GetEyePoint() + smallest_t * ray;
-			putPixel(i, j, smallest_t, norm, theObj, worldcord);
+			worldcord = camera->GetEyePoint() + smallest_t * ray;
+			putPixel(i, windowYSize - j, smallest_t, norm, theObj, worldcord);
 
 		}
 	}
@@ -252,32 +306,46 @@ void callback_start(int id) {
 double getShapeSpecIntersect(objNode* iter, Vector ray, int x, int y){
 
 	Point ep = camera->GetEyePoint();
-	Matrix m = iter->tMat; // Transformation FROM object TO world
+	MatList ml = iter->ml; // Transformation FROM object TO world
 
-	Matrix inv = invert(m);
+	//TODO add Z matrix
+	//Matrix inv = invert(ml.S) * invert(ml.R) * invert(ml.T) * invert(ml.Z);
+
+	Matrix inv = invert(ml.M);
 
 	Point ep_obj = inv * ep;
 	Vector ray_obj = inv * ray;
 
+	// printf("x, y: %d, %d\n", x, y);
+	// printf("Obj Ray: %f %f %f\n", ray_obj[0], ray_obj[1], ray_obj[2]);
+	// printf("Wor Ray: %f %f %f\n", ray[0], ray[1], ray[2]);
+
+	// printf("Wor EP: %f %f %f\n", ep[0], ep[1], ep[2]);
+	// printf("Obj EP: %f %f %f\n", ep_obj[0], ep_obj[1], ep_obj[2]);
+
+	// printf("Matrix is:\n %f, %f, %f, %f\n %f, %f, %f, %f \n %f, %f, %f, %f \n %f, %f, %f, %f, \n \n",
+	// 						ml.M[0], ml.M[4], ml.M[8], ml.M[12],
+	// 						ml.M[1], ml.M[5], ml.M[9], ml.M[13], 
+	// 						ml.M[2], ml.M[6], ml.M[10], ml.M[14],
+	// 						ml.M[3], ml.M[7], ml.M[11], ml.M[15]);
+
 	double t;
-
-
 
 	if (iter->type == SHAPE_CUBE) {
 
-		t = cube->Intersect(ep_obj, ray_obj, m);
+		t = cube->Intersect(ep_obj, ray_obj, ml.M);
 	}
 	else if (iter->type == SHAPE_CYLINDER) {
 
-		t = cylinder->Intersect(ep_obj, ray_obj, m);
+		t = cylinder->Intersect(ep_obj, ray_obj, ml.M);
 	}
 	else if (iter->type == SHAPE_CONE){
 
-		t = cone->Intersect(ep_obj, ray_obj, m);
+		t = cone->Intersect(ep_obj, ray_obj, ml.M);
 
 	}else if (iter->type == SHAPE_SPHERE){
 
-		t = sphere->Intersect(ep_obj, ray_obj, m);
+		t = sphere->Intersect(ep_obj, ray_obj, ml.M);
 
 	} else {
 
@@ -286,16 +354,17 @@ double getShapeSpecIntersect(objNode* iter, Vector ray, int x, int y){
 	}
 
 	Point p_obj = ep_obj + ray_obj * t;
-	Point p_world = m * p_obj;
+	Point p_world = ml.M * p_obj;
 	Vector dist_world = p_world - ep;
 	double toReturn = dist_world.length();
-	return toReturn;
+	//return toReturn;
+	return t;
 
 }
 
 Vector getShapeSpecNormal(objNode* iter, Vector ray, double t){
 	Point ep = camera->GetEyePoint();
-	Matrix m = iter->tMat; // Transformation FROM object TO world
+	Matrix m = iter->ml.M; // Transformation FROM object TO world
 
 	Matrix inv = invert(m);
 
@@ -328,8 +397,9 @@ Vector getShapeSpecNormal(objNode* iter, Vector ray, double t){
 	}
 
 	toRR = hgn * toR;
+	toRR.normalize();
 	return toRR;
-
+	//return Vector(1,0,0);
 }
 
 void putPixel(int i, int j, double smallest_t, Vector norm, objNode* obj, Point worldcord) {
@@ -337,6 +407,14 @@ void putPixel(int i, int j, double smallest_t, Vector norm, objNode* obj, Point 
 	if (smallest_t == -1.0) {
 		setPixel(pixels, i, j, 0, 0, 0);
 		return;
+	} else  {
+		// printf("!!! HIT !!!\n");
+		// Point ep = camera->GetEyePoint();
+		// Vector look = camera->GetLookVector();
+		// Vector up = camera->GetUpVector();
+		// printf("EP: %f %f %f\n", ep[0], ep[1], ep[2]);
+		// printf("Look: %f %f %f\n", look[0], look[1], look[2]);
+		// printf("Up: %f %f %f\n", up[0], up[1], up[2]);
 	}
 
 	int numLights = parser->getNumLights();

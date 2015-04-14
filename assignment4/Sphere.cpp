@@ -59,6 +59,7 @@ double Sphere::Intersect(Point eyePointP, Vector rayV, Matrix transformMatrix) {
 		t1 = ((-B) + sqrt(check)) / (2*A);
 		t2 = ((-B) - sqrt(check)) / (2*A);
 		t = fmin(t1, t2);
+
 	}
 
 	return t;
