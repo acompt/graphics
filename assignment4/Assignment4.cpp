@@ -48,7 +48,10 @@ Vector getShapeSpecNormal(objNode* iter, Vector ray, double t);
 
 /** These are GLUI control panel objects ***/
 int  main_window;
-string filenamePath = "data/general/robot.xml";
+
+string filenamePath = "data/general/test.xml";
+//string filenamePath = "piel.xml";
+
 GLUI_EditText* filenameTextField = NULL;
 GLubyte* pixels = NULL;
 
@@ -74,8 +77,25 @@ void createObjList(SceneNode* root) {
 	addObject(root, idMat);
 }
 
+void deleteObjList(objNode* root) {
+
+	objNode* iter = root;
+
+	while (iter != NULL) {
+		root = iter;
+		iter = iter -> next;
+		delete root;
+	}
+}
+
 
 void addObject(SceneNode* node, Matrix curMat) {
+
+	// TO DELETE
+	printf("Reading a node with %d transforms, %d primitives and %d children.\n",
+		(node->transformations).size(),
+		(node->primitives).size(),
+		(node->children).size());
 
 	if (node == NULL) {
 		return;
@@ -87,9 +107,12 @@ void addObject(SceneNode* node, Matrix curMat) {
 	for(int i = 0; i < transforms; i++) {
 		TransformationType type = node->transformations[i]->type;
 
+		toMult = Matrix();
+
 		if (type == TRANSFORMATION_TRANSLATE){
 
 			v = node->transformations[i]->translate;
+
 			toMult = trans_mat(v);
 
 		} else if (type == TRANSFORMATION_SCALE) {
@@ -105,8 +128,11 @@ void addObject(SceneNode* node, Matrix curMat) {
 		} else if (type == TRANSFORMATION_MATRIX) {
 
 			Matrix toMult = node->transformations[i]->matrix;
-		}	
+		}
+
 		curMat = toMult * curMat;
+
+
 	}
 
 	int primitives = node->primitives.size();
@@ -219,7 +245,7 @@ void callback_start(int id) {
 			Vector norm;
 			objNode* theObj = NULL;
 
-			while (iter != NULL) {
+			while (iter != NULL) {				
 
 				t = getShapeSpecIntersect(iter, ray, i, j);
 
@@ -380,7 +406,7 @@ void putPixel(int i, int j, double smallest_t, Vector norm, objNode* obj, Point 
 	// blueInt = round(blue);
 
 
-	printf("pixel, (%d, %d): r: %d g: %d b:%d \n", i, j, redInt, greenInt, blueInt );
+	//printf("pixel, (%d, %d): r: %d g: %d b:%d \n", i, j, redInt, greenInt, blueInt );
 	setPixel(pixels, i, j, redInt, greenInt, blueInt);
 
 }
@@ -513,6 +539,8 @@ void onExit()
 	if (pixels != NULL) {
 		delete pixels;
 	}
+	deleteObjList(head);
+
 }
 
 /**************************************** main() ********************/
