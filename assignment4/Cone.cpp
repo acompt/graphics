@@ -42,13 +42,13 @@ double Cone::Intersect(Point eyePointP, Vector rayV, Matrix transformMatrix) {
 	double A, B, C, t1, t2, t4, tsmall;
 	Point p2, p1, p4;
 	Vector n = Vector(0, -1.0, 0);
-	Point y2 = Point(0, -0.5, 0);
+	Point y2 = Point(0, 0.5, 0);
 
 	A = rayV[0]*rayV[0] + rayV[2]*rayV[2] - rayV[1]*rayV[1]*r*r;
 	B = 2 * (rayV[0]*eyePointP[0] + rayV[2]*eyePointP[2] - rayV[1]*eyePointP[1]*r*r)
-			+ rayV[1]*r*r;
+			- rayV[1]*r*r;
 	C = eyePointP[0]*eyePointP[0] + eyePointP[2]*eyePointP[2] - 
-		(.25 - eyePointP[1] + eyePointP[1]*eyePointP[1])*r*r;
+		(.25 + eyePointP[1] + eyePointP[1]*eyePointP[1])*r*r;
 
 	double check = B*B - 4*A*C;
 
@@ -61,14 +61,17 @@ double Cone::Intersect(Point eyePointP, Vector rayV, Matrix transformMatrix) {
 		if (p2[1] < -0.5 || p2[1] > 0.5) t2 = -1.0;
 	}
 
-	t4 = -(multV((eyePointP - y2), n)) / multV(rayV, n);
-	p4 = eyePointP + t4*rayV;
+	t4 = -(dot((eyePointP - y2), n)) / dot(rayV, n);
+	if (t4 > 0) {
+		p4 = eyePointP + t4*rayV;
 	
-	if ((p4[0]*p4[0] + p4[2]*p4[2] < r*r) && p4[1] > -0.5 && p4[1] < 0.5) {
-			//printf("hereeee");
-			if (check >= 0)
-				return fmin(t4, fmin(t1, t2));
-			else return t4;
+		if ((p4[0]*p4[0] + p4[2]*p4[2] <= r*r) ) {//&& (p4[1] >= -0.5) && (p4[1] <= 0.5)) {
+				//	printf("%d\n", t4);
+
+				if (check >= 0)
+					return fmin(t4, fmin(t1, t2));
+				else return t4;
+		}
 	}
 	
 	if(check >= 0) return fmin(t1, t2);

@@ -48,7 +48,7 @@ Vector getShapeSpecNormal(objNode* iter, Vector ray, double t);
 
 /** These are GLUI control panel objects ***/
 int  main_window;
-string filenamePath = "data/general/robot.xml";
+string filenamePath = "data/general/unit_cube.xml";
 GLUI_EditText* filenameTextField = NULL;
 GLubyte* pixels = NULL;
 
@@ -227,13 +227,16 @@ void callback_start(int id) {
 					smallest_t = t;
 					norm = getShapeSpecNormal(iter, ray, smallest_t);
 					theObj = iter;
+					
+					worldcord = camera->GetEyePoint() + smallest_t * ray;
+					worldcord = iter->tMat * worldcord;
 				}
 
 				iter = iter->next;
 			}
 
 
-			worldcord = camera->GetEyePoint() + smallest_t * ray;
+			//worldcord = camera->GetEyePoint() + smallest_t * ray;
 			putPixel(i, j, smallest_t, norm, theObj, worldcord);
 
 		}
@@ -278,6 +281,20 @@ double getShapeSpecIntersect(objNode* iter, Vector ray, int x, int y){
 		t = -1.0;
 	}
 
+<<<<<<< Updated upstream
+=======
+	// if ((x == windowXSize/2) && (y == windowYSize/2)) {
+
+	// 	printf("x: %d, y: %d\n", x, y);
+	// 	printf("ray: (%f, %f, %f.\n", ray[0], ray[1], ray[2]);
+	// 	printf("t: %f.\n", t);
+	// 	printf("Eye point: %f, %f, %f.\n", ep[0], ep[1], ep[2]);
+	// 	printf("ep_obj: %f, %f, %f.\n", ep_obj[0], ep_obj[1], ep_obj[2]);
+
+	// }
+
+		//printf("t: %f\n", t);
+>>>>>>> Stashed changes
 		return t;
 
 }
