@@ -281,8 +281,6 @@ double getShapeSpecIntersect(objNode* iter, Vector ray, int x, int y){
 		t = -1.0;
 	}
 
-<<<<<<< Updated upstream
-=======
 	// if ((x == windowXSize/2) && (y == windowYSize/2)) {
 
 	// 	printf("x: %d, y: %d\n", x, y);
@@ -294,7 +292,6 @@ double getShapeSpecIntersect(objNode* iter, Vector ray, int x, int y){
 	// }
 
 		//printf("t: %f\n", t);
->>>>>>> Stashed changes
 		return t;
 
 }
@@ -397,7 +394,7 @@ void putPixel(int i, int j, double smallest_t, Vector norm, objNode* obj, Point 
 	// blueInt = round(blue);
 
 
-	printf("pixel, (%d, %d): r: %d g: %d b:%d \n", i, j, redInt, greenInt, blueInt );
+	//printf("pixel, (%d, %d): r: %d g: %d b:%d \n", i, j, redInt, greenInt, blueInt );
 	setPixel(pixels, i, j, redInt, greenInt, blueInt);
 
 }
