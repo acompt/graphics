@@ -58,15 +58,18 @@ double Sphere::Intersect(Point eyePointP, Vector rayV, Matrix transformMatrix) {
 	if (check >= 0) {
 		t1 = ((-B) + sqrt(check)) / (2*A);
 		t2 = ((-B) - sqrt(check)) / (2*A);
-		t = fmin(t1, t2);
 
+		if ((t1 > 0) && (t2 < 0) ) {
+			return t1;
+		} else if ((t1 < 0) && (t2 >0)){
+			return t2;
+		} else if ((t1 > 0) && (t2 > 0)){
+			return fmin(t1, t2);
+		}
 	}
 
 	return t;
 
-
-
-	//return 0;
 }
 
 static double multP(Point p1, Point p2){
