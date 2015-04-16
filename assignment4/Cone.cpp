@@ -122,7 +122,7 @@ Vector Cone::findIsectNormal(Point eyePoint, Vector ray, double dist){
 
 		Point s = Point(0, i[1], 0);
 
-		Vector xz_comp = s - i;
+		Vector xz_comp = i - s;
 
 		double y0 = 0.5 * xz_comp.length();
 

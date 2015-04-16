@@ -50,7 +50,7 @@ Vector getShapeSpecNormal(objNode* iter, Vector ray, double t);
 
 /** These are GLUI control panel objects ***/
 int  main_window;
-string filenamePath = "data/general/robotS.xml";
+string filenamePath = "data/general/test.xml";
 GLUI_EditText* filenameTextField = NULL;
 GLubyte* pixels = NULL;
 
@@ -573,6 +573,15 @@ void onExit()
 	delete cone;
 	delete sphere;
 	delete camera;
+
+	objNode* temp = head;
+	while (head != NULL){
+		temp = head->next;
+		delete head;
+		head = temp;
+	}
+
+
 	if (parser != NULL) {
 		delete parser;
 	}
