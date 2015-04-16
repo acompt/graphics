@@ -18,7 +18,7 @@ File name: Cylinder.cpp
 #include <unistd.h> 
 
 #define edge_length 1
-#define eps 0.001
+#define eps (0.000001)
 
 #define NEG -0.5
 #define POS 0.5
@@ -28,6 +28,7 @@ static double multP(Point p1, Point p2);
 static double multV(Vector v1, Vector v2);
 static double multPV(Point p, Vector v);
 static bool isEqual(double i, double j);
+double minPos(double t1, double t2);
 
 
 Cylinder::Cylinder() {
@@ -85,24 +86,27 @@ double Cylinder::Intersect(Point eyePointP, Vector rayV, Matrix transformMatrix)
 	bool p1a_in = ((p1a[1] < 0.5) && (p1a[1] > -0.5));
 	bool p2a_in = ((p2a[1] < 0.5) && (p2a[1] > -0.5));
 
-	if (p1a_in && p2a_in) {
-		if(tsmall > 0) 
-			t = fmin(tsmall, fmin(t1, t2));
-		else
-			t = fmin(t1, t2);
-	} else if (p1a_in) {
-		if(tsmall > 0) 
-			t = fmin(tsmall, t1);
-		else
-			t = t1; 
+	if (p1a_in && p2a_in) { 
+		t = minPos(tsmall, minPos(t1, t2));
+	} else if (p1a_in) { 
+		t = minPos(tsmall, t1); 
 	} else if (p2a_in) {
-		if(tsmall > 0) 
-			t = fmin(tsmall, t2);
-		else
-			t = t2; 
+		t = minPos(tsmall, t2);
 	}
 
 	return t;
+}
+
+
+double minPos(double t1, double t2) {
+
+	if ((t1 > 0) && (t2 < 0) ) {
+		return t1;
+	} else if ((t1 < 0) && (t2 >0)){
+		return t2;
+	} else if ((t1 > 0) && (t2 > 0)){
+		return fmin(t1, t2);
+	} else return -1.0;
 }
 
 Vector Cylinder::findIsectNormal(Point eyePoint, Vector ray, double dist){
@@ -112,29 +116,26 @@ Vector Cylinder::findIsectNormal(Point eyePoint, Vector ray, double dist){
 	double y_top = 0.5;
 	double y_bot = -0.5;
 
-	if (isEqual(i[1], y_bot)) {
-		//is on the bottom
-		return Vector (0, -1, 0);
 
+
+	if (isEqual(i[1], y_bot)) {
+		return Vector (0, -1, 0);
 	} 
-	else if (isEqual(i[1], y_top)) {
-		//is on the top
+	if (isEqual(i[1], y_top)) {
 		return Vector (0, 1, 0);
 	}
-	else {
+	Point s = Point(0, i[1], 0);
+	Vector norm = Vector(i[0], 0, i[2]);
 
-		Point s = Point(0, i[1], 0);
-		Vector norm = s - i;
+	norm.normalize();
+	return norm;
 
-		norm.normalize();
-		return norm;
-	}
 
 }
 
 static bool isEqual(double i, double j) {
 
-	if (abs(i - j) < eps) {
+	if (fabsf(i - j) < eps) {
 		return true;
 	} else {
 		return false;
