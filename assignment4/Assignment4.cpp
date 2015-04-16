@@ -536,12 +536,14 @@ void updateCamera()
 
 	Point guiEye (eyeX, eyeY, eyeZ);
 	Point guiLook(lookX, lookY, lookZ);
-	camera->SetViewAngle(viewAngle);
+	camera->SetViewAngle(DEG_TO_RAD(viewAngle));
+
 	Vector upV = camera->GetUpVector();
-	camera->Orient(guiEye, guiLook, upV);
 	camera->RotateU(camRotU);
 	camera->RotateV(camRotV);
 	camera->RotateW(camRotW);
+	camera->Orient(guiEye, guiLook, upV);
+
 }
 
 /***************************************** myGlutDisplay() *****************/

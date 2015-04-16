@@ -47,7 +47,6 @@ void Camera::Orient(Point& eye, Point& focus, Vector& up) {
 
 void Camera::Orient(Point& eye, Vector& look, Vector& up) {
 	
-	SetViewAngle(45);
 
 	this -> eyePoint = eye;
 	this -> upVector = up;
