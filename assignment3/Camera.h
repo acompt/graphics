@@ -29,6 +29,9 @@ class Camera {
 		Matrix RotateArbVec(double angle, Vector a);
 		Matrix RotateWforV(double angle, Vector a);
 
+		Vector getV();
+		Vector getU();
+
 
 		void Rotate(Point p, Vector axis, double degree);
 		void Translate(const Vector &v);

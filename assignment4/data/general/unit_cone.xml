@@ -10,11 +10,18 @@
 		<color r="1" g="1" b="1"/>
 		<position x="3" y="3" z="3"/>
 	</lightdata>
+    <lightdata>
+        <id v="1"/>
+        <color r="1" g="1" b="1"/>
+        <position x="0" y="0" z="-3"/>
+    </lightdata>
+
 
 	<object type="tree" name="root">
 		<transblock>
+            <rotate x="0" y="0" z="1" angle="90"/>
 			<object type="primitive" name="cone" >
-				<diffuse r="1" g="0" b="0"/>
+				<diffuse r="1" g="1" b="0"/>
 			</object>
 		</transblock>
 	</object>

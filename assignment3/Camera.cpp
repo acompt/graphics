@@ -10,10 +10,10 @@ Camera::~Camera() {
 }
 
 void Camera::Reset() {
-	//default position????
-	SetViewAngle(3200);
+
+	SetViewAngle(30);
 	Point theP = Point(0, 0, 0);
-	Vector lVec = Vector(0, 0, 0);
+	Vector lVec = Vector(0, 0, -1);
 	Vector uVec = Vector(0, 1, 0);
 	Orient(theP, lVec, uVec);
 
@@ -21,11 +21,22 @@ void Camera::Reset() {
 	SetFarPlane(500);
 }
 
+Vector Camera::getV(){
+	return this->v;
+
+}
+
+Vector Camera::getU(){
+	return this->u;
+
+
+}
+
+
+
 void Camera::Orient(Point& eye, Point& focus, Vector& up) {
 
-	Vector look = Vector(focus[0] - eye[0],
-							focus[1] - eye[1],
-							focus[2] - eye[2]);
+	Vector look = focus - eye;
 
 	look.normalize();
 
@@ -35,6 +46,8 @@ void Camera::Orient(Point& eye, Point& focus, Vector& up) {
 
 
 void Camera::Orient(Point& eye, Vector& look, Vector& up) {
+	
+	SetViewAngle(45);
 
 	this -> eyePoint = eye;
 	this -> upVector = up;
@@ -77,7 +90,7 @@ Matrix Camera::GetProjectionMatrix() {
 
 
 void Camera::SetViewAngle (double viewAngle) {
-	viewAngle = viewAngle * (PI / 180);
+	//viewAngle = viewAngle * (PI / 180);
 
 	this -> viewAngle = viewAngle;	
 	this -> viewHeightAngle = viewAngle;
@@ -102,11 +115,6 @@ void Camera::SetScreenSize (int screenWidth, int screenHeight) {
 	this -> screenWidth = (double)screenWidth;
 	this -> screenHeight = (double)screenHeight;
 	this -> screenWidthRatio = this -> screenHeight / this -> screenWidth;
-<<<<<<< Updated upstream
-	printf("r:%f\n", screenWidthRatio);
-
-=======
->>>>>>> Stashed changes
 
 }
 

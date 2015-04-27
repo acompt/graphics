@@ -18,8 +18,15 @@
 
 using namespace std;
 
+struct objNode {
+	PrimitiveType type;
+	Matrix M;
+	SceneMaterial material;
+	objNode* next;
+};
+
 /* STATIC FUNCTIONS */
-void static drawNode(SceneNode* node, bool setMaterial);
+void static drawNode(objNode* node, bool setMaterial);
 static int ct =0;
 
 
@@ -42,7 +49,7 @@ float lookZ = -2;
 
 /** These are GLUI control panel objects ***/
 int  main_window;
-string filenamePath = "data\\general\\robot.xml";
+string filenamePath = "data/general/robot.xml";
 GLUI_EditText* filenameTextField = NULL;
 
 
@@ -56,6 +63,114 @@ SceneParser* parser = NULL;
 Camera* camera = new Camera();
 
 void setupCamera();
+
+
+
+
+void storeObj(PrimitiveType n_type, Matrix curMat, SceneMaterial n_material);
+void addObject(SceneNode* node, Matrix curMat);
+
+objNode* head;
+objNode* tail;
+
+void createObjList(SceneNode* root) {
+
+	Matrix M = Matrix();
+
+	head = NULL;
+	tail = NULL;
+
+	addObject(root, M);
+
+}
+
+
+
+
+void addObject(SceneNode* node, Matrix curMat) {
+
+	if (node == NULL) {
+		return;
+	}
+
+	Matrix m_T = Matrix();
+	Matrix m_S = Matrix();
+	Matrix m_R = Matrix();
+	Matrix m_Z = Matrix();
+
+	Matrix newM = Matrix();
+
+	int transforms = 0;
+	Vector v;
+	transforms = node->transformations.size();
+
+	for(int i = 0; i < transforms; i++) {
+		TransformationType type = node->transformations[i]->type;
+
+
+		if (type == TRANSFORMATION_TRANSLATE){
+
+			v = node->transformations[i]->translate;
+			m_T = trans_mat(v);
+			newM = newM * m_T;
+
+		} else if (type == TRANSFORMATION_SCALE) {
+			v = node->transformations[i]->scale;
+			m_S = scale_mat(v);
+			newM = newM * m_S;
+
+		} else if (type == TRANSFORMATION_ROTATE) {
+			v = node->transformations[i]->rotate;
+			float angle = node->transformations[i]->angle;
+
+			m_R = rot_mat(v, angle);
+			newM = newM * m_R;
+
+		} else if (type == TRANSFORMATION_MATRIX) {
+
+			m_Z = node->transformations[i]->matrix;
+			newM = newM * m_Z;
+		}	
+
+	}
+
+	//newM = m_Z * m_T * m_R * m_S;
+
+	curMat = curMat * newM;
+
+	int primitives = node->primitives.size();
+
+	for(int i = 0; i < primitives; i++) {
+		
+		storeObj(node->primitives[i]->type, curMat, node->primitives[i]->material);
+	}
+
+	int size = node->children.size();
+
+	for(int i=0; i < size; i++){
+   		addObject(node->children[i], curMat);
+	}
+}
+
+void storeObj(PrimitiveType n_type, Matrix curMat, SceneMaterial n_material) {
+
+	objNode* newNode = new objNode();
+
+	newNode -> type = n_type;
+	newNode -> M = curMat;
+	newNode -> material = n_material;
+	newNode -> next = NULL;
+
+	if (head == NULL) {
+		head = newNode;
+		tail = newNode;
+	} else {
+		tail -> next = newNode;
+		tail = newNode;
+	}
+}
+
+
 
 void callback_load(int id) {
 	char curDirName [2048];
@@ -245,80 +360,23 @@ void applyMaterial(const SceneMaterial &material)
 
 
 
-void static drawNode(SceneNode* node, bool setMaterial){
+void static drawNode(objNode* node, bool setMaterial){
 
 	if (node == NULL) {
 		return;
 	}
 
-	//printf("I am node number %d.\n", ct++);
-
 
 	glPushMatrix();
+		glMultMatrixd(node->M.unpack());
 
-	int transforms = node->transformations.size();
-	for(int i = 0; i < transforms; i++) {
-
-		TransformationType type = node->transformations[i]->type;
-
-		if (type == TRANSFORMATION_TRANSLATE){
-
-			Vector v = node->transformations[i]->translate;
-
-			glTranslatef(v[0], v[1], v[2]);
-
-
-		} else if (type == TRANSFORMATION_SCALE) {
-
-			Vector v = node->transformations[i]->scale;
-
-			glScalef(v[0], v[1], v[2]);
-
-
-		} else if (type == TRANSFORMATION_ROTATE) {
-
-			Vector v = node->transformations[i]->rotate;
-			float angle = node->transformations[i]->angle;
-
-			//angle = angle * (PI / 180);
-
-			//glRotatef(angle, v[0], v[1], v[2]);
-
-			
-			Matrix toMult = rot_mat(v, angle);
-
-			glMultMatrixd(toMult.unpack());
-			
-
-		} else if (type == TRANSFORMATION_MATRIX) {
-
-			Matrix toMult = node->transformations[i]->matrix;
-
-			glMultMatrixd(toMult.unpack());
-	
-		}	
-
-	}
-
-	int primitives = node->primitives.size();
-	for(int i = 0; i < primitives; i++) {
 		if (setMaterial) {
-			applyMaterial(node->primitives[i]->material);
+			applyMaterial(node->material);
 		}
 
-		renderShape(node->primitives[i]->type);
-
-		//also has meshfile and material????????????????
-	
-	}
-
-	int size = node->children.size();
-
-	for(int i=0; i < size; i++){
-   		drawNode(node->children[i], setMaterial);
-	}
-
+		renderShape(node->type);
 	glPopMatrix();
+
 
 }
 
@@ -360,6 +418,8 @@ void myGlutDisplay(void)
 	SceneNode* root = parser->getRootNode();
 	Matrix compositeMatrix;
 
+	createObjList(root);
+
 	//drawing the axes
 	glEnable(GL_COLOR_MATERIAL);
     glDisable(GL_LIGHTING);
@@ -379,7 +439,7 @@ void myGlutDisplay(void)
 		//TODO: draw wireframe of the scene...
 		// note that you don't need to applyMaterial, just draw the geometry
 
-		drawNode(root, false);
+		drawNode(head, false);
 
 	}
 
@@ -398,7 +458,11 @@ void myGlutDisplay(void)
 		//TODO: render the scene...
 		// note that you should always applyMaterial first, then draw the geometry
 
-		drawNode(root, true);
+		objNode* temp = head;
+		while (temp != NULL) {
+			drawNode(temp, true);
+			temp = temp->next;
+		}
 	}
 	glDisable(GL_LIGHTING);
 	

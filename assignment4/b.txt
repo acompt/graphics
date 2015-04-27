@@ -1,0 +1,8 @@
+data/general/robotR.xml
+success? loading file ..
+Loaded file data/general/robotR.xml
+Begin parsing file...
+Finished parsing file.
+1
+start button clicked!
+(w, h): 500, 500
