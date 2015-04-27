@@ -13,6 +13,9 @@
 #include "SceneParser.h"
 #include "Camera.h"
 
+#define eps (0.0001)
+
+
 using namespace std;
 
 struct objNode {
@@ -20,6 +23,12 @@ struct objNode {
 	Matrix M;
 	SceneMaterial material;
 	objNode* next;
+};
+
+struct rgbf {
+	double rf;
+	double gf;
+	double bf;
 };
 
 /** These are the live variables passed into GLUI ***/
@@ -36,26 +45,28 @@ float lookX = -2;
 float lookY = -2;
 float lookZ = -2;
 
+int noRec = 0;
+
 
 double windowXSize = 500;
 double windowYSize = 500;
 
-
-
+rgbf getColor(Point orig, Vector ray, int recLeft);
+static bool isEqual(double i, double j);
 void storeObj(PrimitiveType n_type, Matrix curMat, SceneMaterial n_material);
 void addObject(SceneNode* node, Matrix curMat);
-double getShapeSpecIntersect(objNode* iter, Vector ray, int x, int y);
+double getShapeSpecIntersect(Point orig, objNode* iter, Vector ray);
 void putPixel(int i, int j, double smallest_t, Vector norm, objNode* obj, Point worldcord);
-Vector getShapeSpecNormal(objNode* iter, Vector ray, double t);
+Vector getShapeSpecNormal(Point orig, objNode* iter, Vector ray, double t);
 
 /** These are GLUI control panel objects ***/
 int  main_window;
-string filenamePath = "data/general/test.xml";
+string filenamePath = "data/tests/shinyballs.xml";
 GLUI_EditText* filenameTextField = NULL;
 GLubyte* pixels = NULL;
 
-int pixelWidth = 500, pixelHeight = 500;
-int screenWidth = 500, screenHeight = 500;
+int pixelWidth = 0, pixelHeight = 0;
+int screenWidth = 0, screenHeight = 0;
 
 /** these are the global variables used for rendering **/
 Cube* cube = new Cube();
@@ -68,7 +79,14 @@ Camera* camera = new Camera();
 objNode* head;
 objNode* tail;
 
+static bool isEqual(double i, double j) {
 
+	if (fabsf(i - j) < eps) {
+		return true;
+	} else {
+		return false;
+	}
+}
 
 void createObjList(SceneNode* root) {
 
@@ -234,50 +252,188 @@ void callback_start(int id) {
 
 	cout << "(w, h): " << pixelWidth << ", " << pixelHeight << endl;
 
-	objNode* iter;
 	Vector ray;
-	Point worldcord;
+
+	rgbf rgbFinal;
+	int redInt, greenInt, blueInt;
+
 	for (int i = 0; i < pixelWidth; i++) {
 		for (int j = 0; j < pixelHeight; j++) {
 
-
 			ray = generateRay(i, j);
 
-			iter = head;
-			double t = -1.0;
-			double smallest_t = -1.0;
-			Vector norm;
-			objNode* theObj = NULL;
+			rgbFinal = getColor(camera->GetEyePoint(), ray, noRec);
 
-			while (iter != NULL) {
+			redInt = round(255.0 * rgbFinal.rf);
+			greenInt = round(255.0 * rgbFinal.gf);
+			blueInt = round(255.0 * rgbFinal.bf);
 
-				t = getShapeSpecIntersect(iter, ray, i, j);
-
-				if (((smallest_t == -1.0) && (t > 0)) || ((t > 0) && (t < smallest_t))) {
-					smallest_t = t;
-					norm = getShapeSpecNormal(iter, ray, smallest_t);
-					theObj = iter;
-					
-					worldcord = camera->GetEyePoint() + smallest_t * ray;
-					worldcord = iter->M * worldcord;
-				}
-
-				iter = iter->next;
+			if (redInt > 255){
+				redInt = 255;
+			}
+			if (greenInt > 255){
+				greenInt = 255;
+			}
+			if (blueInt > 255){
+				blueInt = 255;
 			}
 
-
-			worldcord = camera->GetEyePoint() + smallest_t * ray;
-			putPixel(i, windowYSize - j, smallest_t, norm, theObj, worldcord);
-
+			setPixel(pixels, i, windowYSize - j, redInt, greenInt, blueInt);
 		}
 	}
 	glutPostRedisplay();
 }
 
 
-double getShapeSpecIntersect(objNode* iter, Vector ray, int x, int y){
+rgbf getColor(Point orig, Vector ray, int recLeft) {
 
-	Point ep = camera->GetEyePoint();
+	SceneLightData data;
+	SceneGlobalData global_data;
+	SceneColor color;
+
+	double red, green, blue, redA, greenA, blueA, redD, greenD, blueD, redS, greenS, blueS, sumR, sumG, sumB;
+	double dotProd_d, dotProd_s;
+	Vector norm, Lm, Ri, Vhat;
+	Point worldcord;
+
+	int numLights = parser->getNumLights();
+	objNode* iter = head;
+	double t = -1.0;
+	double smallest_t = -1.0;
+	objNode* theObj = NULL;
+
+	rgbf toR, toAdd;
+
+	toR.rf = 0.0;
+	toR.gf = 0.0;
+	toR.bf = 0.0;
+
+	if (recLeft == -1) {
+		return toR;
+	}
+
+
+	while (iter != NULL) {
+
+		t = getShapeSpecIntersect(orig, iter, ray);
+
+		if ((isEqual(smallest_t, -1.0) && (t > 0)) || ((t > 0) && (t < smallest_t))) {
+			smallest_t = t;
+			theObj = iter;
+
+		}
+		iter = iter->next;
+	}
+
+	if (theObj == NULL) {
+		return toR;
+	}
+
+	norm = getShapeSpecNormal(orig, theObj, ray, smallest_t);
+
+	worldcord = orig + smallest_t * ray;
+	
+	if (isEqual(smallest_t, -1.0)) {
+		return toR;
+	}
+
+
+	parser->getGlobalData(global_data);
+	double spec_comp = 100; // TODO CHANGE THIS TO BE CHANGED ELSEWHERE?
+
+	float ka = global_data.ka;
+	float kd = global_data.kd;
+	float ks = global_data.ks;
+
+
+	redA = theObj->material.cAmbient.r;
+	greenA = theObj->material.cAmbient.g;
+	blueA = theObj->material.cAmbient.b;
+
+	redD = theObj->material.cDiffuse.r;
+	greenD = theObj->material.cDiffuse.g;
+	blueD = theObj->material.cDiffuse.b;
+
+	redS = theObj->material.cSpecular.r;
+	greenS = theObj->material.cSpecular.g;
+	blueS = theObj->material.cSpecular.b;
+
+
+	sumR = 0.0;
+	sumB = 0.0;
+	sumG = 0.0;
+
+	for (int m = 0; m < numLights; m++) {
+		parser->getLightData(m, data);
+
+		color = data.color;
+
+		if (data.type == LIGHT_POINT){
+			Lm = data.pos - worldcord;
+			Lm.normalize();
+		} else if (data.type == LIGHT_DIRECTIONAL) {
+			Lm = data.dir;
+			Lm.normalize();
+		}
+
+		dotProd_d = dot(norm, Lm);
+
+		if (dotProd_d < 0 ) {
+			dotProd_d = 0;
+		}
+
+
+		// TODO be sure this is right
+		Ri = Lm - 2 * (dotProd_d) * norm;
+		Ri.normalize();
+
+		Vhat = orig - worldcord;
+		Vhat.normalize();
+
+		dotProd_s = dot(Ri, Vhat);
+
+		// if (dotProd_s < 0 ) {
+		// 	dotProd_s = 0;
+		// }
+
+		sumR += kd * redD * color.r * dotProd_d + ks * redS * pow(dotProd_s, spec_comp);
+		sumG += kd * greenD * color.g * dotProd_d + ks * greenS * pow(dotProd_s, spec_comp);
+		sumB += kd * blueD * color.b * dotProd_d + ks * blueS * pow(dotProd_s, spec_comp);
+
+	}
+
+	red = ka * redA + sumR;
+	green = ka * greenA + sumG;
+	blue = ka * blueA + sumB;
+
+
+
+
+	// TODO: CHECK TO SEE IF THESE VALUES ARE VERY LOW, IF
+	// SO, DON'T BOTHER RECURSING FARTHER.
+
+
+	double dp = dot(ray, norm);
+
+
+	Vector nRay = ray - 2 * dp * norm;
+	nRay.normalize();
+
+	toAdd = getColor(worldcord, nRay, recLeft - 1);
+
+	//printf(" %f, %f, %f \n", toAdd.rf, toAdd.gf, toAdd.bf);
+
+	toR.rf = red + toAdd.rf;
+	toR.gf = green + toAdd.gf;
+	toR.bf = blue + toAdd.bf;
+
+	return toR;
+}
+
+
+double getShapeSpecIntersect(Point orig, objNode* iter, Vector ray){
+
+	Point ep = orig;
 	Matrix M = iter->M; // Transformation FROM object TO world
 
 	Matrix inv = invert(M);
@@ -318,8 +474,9 @@ double getShapeSpecIntersect(objNode* iter, Vector ray, int x, int y){
 
 }
 
-Vector getShapeSpecNormal(objNode* iter, Vector ray, double t){
-	Point ep = camera->GetEyePoint();
+Vector getShapeSpecNormal(Point orig, objNode* iter, Vector ray, double t){
+
+	Point ep = orig;
 	Matrix m = iter->M; // Transformation FROM object TO world
 
 	Matrix inv = invert(m); //
@@ -356,99 +513,6 @@ Vector getShapeSpecNormal(objNode* iter, Vector ray, double t){
 	return world_normal;
 	
 }
-
-void putPixel(int i, int j, double smallest_t, Vector norm, objNode* obj, Point worldcord) {
-	
-	if (smallest_t == -1.0) {
-		setPixel(pixels, i, j, 0, 0, 0);
-		return;
-	} else  {
-
-	}
-
-	int numLights = parser->getNumLights();
-	double red, green, blue, redA, greenA, blueA, redD, greenD, blueD, sumR, sumG, sumB;
-	SceneLightData data;
-	SceneGlobalData global_data;
-	SceneColor color;
-	double dotProd;
-	int redInt, greenInt, blueInt;
-	Vector Lm;
-
-	parser->getGlobalData(global_data);
-
-	float ka = global_data.ka;
-	float kd = global_data.kd;
-
-	redA = obj->material.cAmbient.r;
-	greenA = obj->material.cAmbient.g;
-	blueA = obj->material.cAmbient.b;
-
-	redD = obj->material.cDiffuse.r;
-	greenD = obj->material.cDiffuse.g;
-	blueD = obj->material.cDiffuse.b;
-
-
-	sumR = 0.0;
-	sumB = 0.0;
-	sumG = 0.0;
-
-	for (int m = 0; m < numLights; m++) {
-		parser->getLightData(m, data);
-
-		color = data.color;
-
-		if (data.type == LIGHT_POINT){
-			Lm = data.pos - worldcord;
-			Lm.normalize();
-		} else if (data.type == LIGHT_DIRECTIONAL) {
-			Lm = data.dir;
-			Lm.normalize();
-		} else { 
-			// ERROR 
-		}
-
-		dotProd = dot(norm, Lm);
-
-		if (dotProd < 0 ) {
-			dotProd = 0;
-		}
-
-		sumR += kd * redD * color.r * dotProd;
-		sumG += kd * greenD * color.g * dotProd;
-		sumB += kd * blueD * color.b * dotProd;
-
-	}
-
-	red = ka * redA + sumR;
-	blue = ka * blueA + sumB;
-	green = ka * greenA + sumG;
-
-	redInt = round(255*red);
-	greenInt = round(255*green);
-	blueInt = round(255*blue);
-
-	if (redInt > 255){
-		redInt = 255;
-	}
-	if (greenInt > 255){
-		greenInt = 255;
-	}
-	if (blueInt > 255){
-		blueInt = 255;
-	}
-
-
-	// redInt = round(red);
-	// greenInt = round(green);
-	// blueInt = round(blue);
-
-
-	//printf("pixel, (%d, %d): r: %d g: %d b:%d \n", i, j, redInt, greenInt, blueInt );
-	setPixel(pixels, i, j, redInt, greenInt, blueInt);
-
-}
-
 
 void callback_load(int id) {
 	char curDirName [2048];
@@ -620,6 +684,10 @@ int main(int argc, char* argv[])
 	glui->add_button("Load", 0, callback_load);
 	glui->add_button("Start!", 0, callback_start);
 	glui->add_checkbox("Isect Only", &isectOnly);
+
+	GLUI_Panel *rec_panel = glui->add_panel("Assignment 5");
+	(new GLUI_Spinner(rec_panel, "Recurse:", &noRec))
+		->set_int_limits(0, 4);
 	
 	GLUI_Panel *camera_panel = glui->add_panel("Camera");
 	(new GLUI_Spinner(camera_panel, "RotateV:", &camRotV))
