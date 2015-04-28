@@ -158,9 +158,9 @@ void addObject(SceneNode* node, Matrix curMat) {
 
 	curMat = curMat * newM;
 
-	int primitives = node->primitives.size();
+	int pm = node->primitives.size();
 
-	for(int i = 0; i < primitives; i++) {
+	for(int i = 0; i < pm; i++) {
 		
 		storeObj(node->primitives[i]->type, curMat, node->primitives[i]->material);
 	}
@@ -296,7 +296,8 @@ rgbf getColor(Point orig, Vector ray, int recLeft) {
 	SceneGlobalData global_data;
 	SceneColor color;
 
-	double red, green, blue, redA, greenA, blueA, redD, greenD, blueD, redS, greenS, blueS, sumR, sumG, sumB;
+	double red, green, blue, redA, greenA, blueA, redD, greenD, blueD;
+	double redS, greenS, blueS, redR, greenR, blueR, sumR, sumG, sumB;
 	double dotProd_d, dotProd_s;
 	Vector norm, Lm, Ri, Vhat;
 	Point worldcord;
@@ -372,6 +373,9 @@ rgbf getColor(Point orig, Vector ray, int recLeft) {
 	greenS = theObj->material.cSpecular.g;
 	blueS = theObj->material.cSpecular.b;
 
+	redR = theObj->material.cReflective.r;
+	greenR = theObj->material.cReflective.g;
+	blueR = theObj->material.cReflective.b;
 
 	sumR = 0.0;
 	sumB = 0.0;
@@ -398,6 +402,8 @@ rgbf getColor(Point orig, Vector ray, int recLeft) {
 			}
 		}
 
+		// Lm points FROM object TO light
+
 		dotProd_d = dot(norm, Lm);
 
 		if (dotProd_d < 0 ) {
@@ -407,7 +413,7 @@ rgbf getColor(Point orig, Vector ray, int recLeft) {
 		// ???
 		// ???
 		// ???
-		Vector Lm_in = (-1) * Lm;
+		// Vector Lm_in = (-1) * Lm;
 
 
 
@@ -423,6 +429,14 @@ rgbf getColor(Point orig, Vector ray, int recLeft) {
 			dotProd_s = 0;
 		}
 
+
+		// Vector Lm_in = (-1) * Lm;
+		// dotProd_d = dot(norm, Lm_in);
+
+		// if (dotProd_d < 0 ) {
+		// 	dotProd_d = 0;
+		// }
+	
 
 		sumR += kd * redD * color.r * dotProd_d + ks * redS * pow(dotProd_s, specC);
 		sumG += kd * greenD * color.g * dotProd_d + ks * greenS * pow(dotProd_s, specC);
@@ -451,9 +465,9 @@ rgbf getColor(Point orig, Vector ray, int recLeft) {
 
 	toAdd = getColor(thanksRemco, nRay, recLeft - 1);
 
-	toR.rf = fix(red + fix(toAdd.rf));
-	toR.gf = fix(green + fix(toAdd.gf));
-	toR.bf = fix(blue + fix(toAdd.bf));
+	toR.rf = fix(red + ks * redR * toAdd.rf);
+	toR.gf = fix(green + ks * greenR * toAdd.gf);
+	toR.bf = fix(blue + ks * blueR * toAdd.bf);
 
 	return toR;
 }
