@@ -113,7 +113,8 @@ void Camera::SetScreenSize (int screenWidth, int screenHeight) {
 
 	this -> screenWidth = (double)screenWidth;
 	this -> screenHeight = (double)screenHeight;
-	this -> screenWidthRatio = this -> screenHeight / this -> screenWidth;
+	//	w = h * ratio;
+	this -> screenWidthRatio = screenWidth / screenHeight;
 
 }
 
@@ -237,6 +238,5 @@ double Camera::GetFilmPlanDepth() {
 }
 
 double Camera::GetScreenWidthRatio() {
-	return 1.0;
-//	return screenWidthRatio;
+	return screenWidthRatio;
 }
