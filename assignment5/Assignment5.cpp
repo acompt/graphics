@@ -47,7 +47,7 @@ float lookZ = -2;
 
 int noRec = 1;
 int specC = 100;
-double arb_dist = 20;
+double arb_dist = 200;
 
 
 double windowXSize = 500;
@@ -66,7 +66,7 @@ Vector getShapeSpecNormal(Point orig, objNode* iter, Vector ray, double t);
 
 /** These are GLUI control panel objects ***/
 int  main_window;
-string filenamePath = "./shinyballs.xml";
+string filenamePath = "./data/tests/shadow_test.xml";
 GLUI_EditText* filenameTextField = NULL;
 GLubyte* pixels = NULL;
 
@@ -389,9 +389,11 @@ rgbf getColor(Point orig, Vector ray, int recLeft) {
 				continue;
 			}
 		} else if (data.type == LIGHT_DIRECTIONAL) {
-			Lm = data.dir;
+			// We do enter this loop
+			Lm = (-1) * data.dir;
+			// This vector is right
 			Lm.normalize();
-			if (notClear(thanksRemco, thanksRemco - arb_dist * Lm)){
+			if (notClear(thanksRemco, thanksRemco + arb_dist * Lm)){
 				continue;
 			}
 		}
@@ -401,6 +403,12 @@ rgbf getColor(Point orig, Vector ray, int recLeft) {
 		if (dotProd_d < 0 ) {
 			dotProd_d = 0;
 		}
+
+		// ???
+		// ???
+		// ???
+		Vector Lm_in = (-1) * Lm;
+
 
 
 		// TODO be sure this is right
@@ -729,7 +737,7 @@ int main(int argc, char* argv[])
 	glutInitWindowPosition(50, 50);
 	glutInitWindowSize(500, 500);
 
-	main_window = glutCreateWindow("COMP 175 Assignment 4");
+	main_window = glutCreateWindow("COMP 175 Assignment 5");
 	glutDisplayFunc(myGlutDisplay);
 	glutReshapeFunc(myGlutReshape);
 
