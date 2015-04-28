@@ -66,7 +66,7 @@ Vector getShapeSpecNormal(Point orig, objNode* iter, Vector ray, double t);
 
 /** These are GLUI control panel objects ***/
 int  main_window;
-string filenamePath = "./data/tests/shadow_test.xml";
+string filenamePath = "./shinyballs.xml";
 GLUI_EditText* filenameTextField = NULL;
 GLubyte* pixels = NULL;
 
@@ -255,7 +255,7 @@ void callback_start(int id) {
 	pixels = new GLubyte[pixelWidth  * pixelHeight * 3];
 	memset(pixels, 0, pixelWidth  * pixelHeight * 3);
 
-	cout << "(w, h): " << pixelWidth << ", " << pixelHeight << endl;
+	// cout << "(w, h): " << pixelWidth << ", " << pixelHeight << endl;
 
 	Vector ray;
 
@@ -344,8 +344,6 @@ rgbf getColor(Point orig, Vector ray, int recLeft) {
 
 	worldcord = orig + smallest_t * ray;
 	Point thanksRemco = worldcord + norm * eps;
-
-	// printf("wc: %f, %f, %f\n", worldcord[0], worldcord[1], worldcord[2] );
 	
 	if (isEqual(smallest_t, -1.0)) {
 
@@ -354,7 +352,6 @@ rgbf getColor(Point orig, Vector ray, int recLeft) {
 
 
 	parser->getGlobalData(global_data);
-	// double spec_comp = 200; // TODO CHANGE THIS TO BE CHANGED ELSEWHERE?
 
 	float ka = global_data.ka;
 	float kd = global_data.kd;
@@ -410,14 +407,7 @@ rgbf getColor(Point orig, Vector ray, int recLeft) {
 			dotProd_d = 0;
 		}
 
-		// ???
-		// ???
-		// ???
-		// Vector Lm_in = (-1) * Lm;
 
-
-
-		// TODO be sure this is right
 		Ri = Lm - 2 * (dotProd_d) * norm;
 		Ri.normalize();
 
@@ -428,15 +418,6 @@ rgbf getColor(Point orig, Vector ray, int recLeft) {
 		if (dotProd_s < 0 ) {
 			dotProd_s = 0;
 		}
-
-
-		// Vector Lm_in = (-1) * Lm;
-		// dotProd_d = dot(norm, Lm_in);
-
-		// if (dotProd_d < 0 ) {
-		// 	dotProd_d = 0;
-		// }
-	
 
 		sumR += kd * redD * color.r * dotProd_d + ks * redS * pow(dotProd_s, specC);
 		sumG += kd * greenD * color.g * dotProd_d + ks * greenS * pow(dotProd_s, specC);
