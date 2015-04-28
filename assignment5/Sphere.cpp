@@ -40,6 +40,26 @@ Sphere::Sphere() {
 	vertexList = new VertexList;
 }
 
+Point Sphere::getTextureMap(Point orig){
+
+	// x, y coord on unit square, u, v number of repeats,
+	// s, t, are coordinates on single instance of image (bet 0 and 1)
+	double x, y, theta, phi;
+	Point toR;
+
+	theta = atan(orig[2] / orig[0]);
+	phi = asin(orig[1] / 0.5);
+	y = phi / PI + 0.5;
+
+	x = theta / ( 2 * PI);
+
+	toR[0] = x;
+	toR[1] = y;
+	toR[2] = 0.0;
+
+	return toR;
+}
+
 
 double Sphere::Intersect(Point eyePointP, Vector rayV, Matrix transformMatrix) {
 
