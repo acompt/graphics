@@ -25,7 +25,7 @@ public:
 
 	void draw();
 
-	Point getTextureMap(Point orig)
+	Point getTextureMap(Point orig);
 
 	void drawNormal();
 

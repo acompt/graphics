@@ -24,6 +24,9 @@ public:
 
 	void draw();
 
+	Point getTextureMap(Point orig);
+
+
 	void drawNormal();
 
 	double Intersect(Point eyePointP, Vector rayV, Matrix transformMatrix);

@@ -108,6 +108,35 @@ double Cone::Intersect(Point eyePointP, Vector rayV, Matrix transformMatrix) {
 	
 }
 
+Point Cone::getTextureMap(Point orig) {
+
+	double y_bot = -0.5;
+	double x, y, theta, phi;
+
+	Point toR;
+	toR[2] = 0.0;
+
+	if (isEqual(orig[1], y_bot)) {
+
+		toR[0] = orig[0] + 0.5;
+		toR[1] = orig[2] + 0.5;
+
+		return toR;
+
+	} 
+
+	theta = atan(orig[2] / orig[0]);
+	x = theta / ( 2 * PI);
+	y = orig[1] + 0.5;
+
+	toR[0] = x;
+	toR[1] = y;
+
+	return toR;
+
+}
+
+
 Vector Cone::findIsectNormal(Point eyePoint, Vector ray, double dist){
 
 

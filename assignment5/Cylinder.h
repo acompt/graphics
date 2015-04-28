@@ -28,6 +28,8 @@ public:
 
 	void drawNormal();
 
+	Point getTextureMap(Point orig);
+
 	void makeFaceList();
 
 	void makeLid(float theta, float initX, float initY, float initZ, 

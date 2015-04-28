@@ -119,6 +119,52 @@ double Cube::Intersect(Point eyePointP, Vector rayV, Matrix transformMatrix) {
 	return tsmall;
 }
 
+Point Cube::getTextureMap(Point orig){
+
+	Point toR;
+
+	toR[2] = 0.0;
+
+	//top
+	if(isEqual(orig[1], 0.5)){
+		toR[0] = orig[0] + 0.5;
+		toR[1] = orig[2] + 0.5; 
+	}
+
+	//bottom
+	if(isEqual(orig[1], -0.5)){
+		toR[0] = 1 - (orig[0] + 0.5);
+		toR[1] = 1 - (orig[2] + 0.5); 
+	}
+
+	//front
+	if(isEqual(orig[2], 0.5)){
+		toR[0] = orig[0] + 0.5;
+		toR[1] = orig[1] + 0.5; 
+	}
+
+	//back
+	if(isEqual(orig[2], -0.5)){
+		toR[0] = 1 - (orig[0] + 0.5);
+		toR[1] = 1 - (orig[1] + 0.5); 
+	}
+
+	//right
+	if(isEqual(orig[0], 0.5)){
+		toR[0] = orig[2] + 0.5;
+		toR[1] = orig[1] + 0.5; 
+	}
+
+	//left
+	if(isEqual(orig[0], -0.5)){
+		toR[0] = 1 - (orig[2] + 0.5);
+		toR[1] = 1 - (orig[1] + 0.5); 
+	}
+
+	return toR;
+}
+
+
 Vector Cube::findIsectNormal(Point eyePoint, Vector ray, double dist){
 	Point i = eyePoint + dist * ray;
 	Vector norm = Vector(0, 0, 0);
