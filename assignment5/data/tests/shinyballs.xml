@@ -48,7 +48,7 @@
   <transblock>
     <translate x="0" y="-5" z="-5"/>
     <scale x="5" y="5" z="5"/>
-    <object type="primitive" name="cube" >
+    <object type="primitive" name="sphere" >
       <diffuse r="0" g="1" b="1"/>
       <ambient r="0" g="1" b="1"/>
       <reflective r="0" g="1" b="1"/>

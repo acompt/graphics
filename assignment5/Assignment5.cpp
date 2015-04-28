@@ -13,7 +13,7 @@
 #include "SceneParser.h"
 #include "Camera.h"
 
-#define eps (0.0001)
+#define eps (0.000001)
 
 
 using namespace std;
@@ -45,12 +45,17 @@ float lookX = -2;
 float lookY = -2;
 float lookZ = -2;
 
-int noRec = 0;
+int noRec = 1;
+int specC = 100;
+double arb_dist = 20;
 
 
 double windowXSize = 500;
 double windowYSize = 500;
 
+double fix(double d);
+
+bool notClear(Point me, Point light);
 rgbf getColor(Point orig, Vector ray, int recLeft);
 static bool isEqual(double i, double j);
 void storeObj(PrimitiveType n_type, Matrix curMat, SceneMaterial n_material);
@@ -61,7 +66,7 @@ Vector getShapeSpecNormal(Point orig, objNode* iter, Vector ray, double t);
 
 /** These are GLUI control panel objects ***/
 int  main_window;
-string filenamePath = "data/tests/shinyballs.xml";
+string filenamePath = "./shinyballs.xml";
 GLUI_EditText* filenameTextField = NULL;
 GLubyte* pixels = NULL;
 
@@ -208,8 +213,8 @@ Vector generateRay(int pixelX, int pixelY) {
 	h = n * tan(angle/2);
 	w = h * ratio;
 
-	a = -w + (2*w)*((double)pixelX/(double)windowXSize);
-	b = h - (2*h)*((double)pixelY/(double)windowYSize);
+	a = -w + (2*w)*((double)pixelX/(double)pixelWidth);
+	b = h - (2*h)*((double)pixelY/(double)pixelHeight);
 	q = camera->GetEyePoint() + n*camera->GetLookVector();
 
 	UVec = camera->getU();
@@ -278,7 +283,7 @@ void callback_start(int id) {
 				blueInt = 255;
 			}
 
-			setPixel(pixels, i, windowYSize - j, redInt, greenInt, blueInt);
+			setPixel(pixels, i, pixelHeight - j, redInt, greenInt, blueInt);
 		}
 	}
 	glutPostRedisplay();
@@ -309,6 +314,10 @@ rgbf getColor(Point orig, Vector ray, int recLeft) {
 	toR.bf = 0.0;
 
 	if (recLeft == -1) {
+		// if (orig == camera->GetEyePoint()){
+		// 	printf("THE FUCK\n");
+		// }
+		// toR.rf = 1.0;
 		return toR;
 	}
 
@@ -326,20 +335,25 @@ rgbf getColor(Point orig, Vector ray, int recLeft) {
 	}
 
 	if (theObj == NULL) {
+		// toR.gf = 1.0;
 		return toR;
 	}
 
 	norm = getShapeSpecNormal(orig, theObj, ray, smallest_t);
 
 	worldcord = orig + smallest_t * ray;
+	Point thanksRemco = worldcord + norm * eps;
+
+	// printf("wc: %f, %f, %f\n", worldcord[0], worldcord[1], worldcord[2] );
 	
 	if (isEqual(smallest_t, -1.0)) {
+
 		return toR;
 	}
 
 
 	parser->getGlobalData(global_data);
-	double spec_comp = 100; // TODO CHANGE THIS TO BE CHANGED ELSEWHERE?
+	// double spec_comp = 200; // TODO CHANGE THIS TO BE CHANGED ELSEWHERE?
 
 	float ka = global_data.ka;
 	float kd = global_data.kd;
@@ -371,9 +385,15 @@ rgbf getColor(Point orig, Vector ray, int recLeft) {
 		if (data.type == LIGHT_POINT){
 			Lm = data.pos - worldcord;
 			Lm.normalize();
+			if (notClear(thanksRemco, data.pos)){
+				continue;
+			}
 		} else if (data.type == LIGHT_DIRECTIONAL) {
 			Lm = data.dir;
 			Lm.normalize();
+			if (notClear(thanksRemco, thanksRemco - arb_dist * Lm)){
+				continue;
+			}
 		}
 
 		dotProd_d = dot(norm, Lm);
@@ -387,18 +407,18 @@ rgbf getColor(Point orig, Vector ray, int recLeft) {
 		Ri = Lm - 2 * (dotProd_d) * norm;
 		Ri.normalize();
 
-		Vhat = orig - worldcord;
+		Vhat = worldcord - orig;
 		Vhat.normalize();
 
 		dotProd_s = dot(Ri, Vhat);
+		if (dotProd_s < 0 ) {
+			dotProd_s = 0;
+		}
 
-		// if (dotProd_s < 0 ) {
-		// 	dotProd_s = 0;
-		// }
 
-		sumR += kd * redD * color.r * dotProd_d + ks * redS * pow(dotProd_s, spec_comp);
-		sumG += kd * greenD * color.g * dotProd_d + ks * greenS * pow(dotProd_s, spec_comp);
-		sumB += kd * blueD * color.b * dotProd_d + ks * blueS * pow(dotProd_s, spec_comp);
+		sumR += kd * redD * color.r * dotProd_d + ks * redS * pow(dotProd_s, specC);
+		sumG += kd * greenD * color.g * dotProd_d + ks * greenS * pow(dotProd_s, specC);
+		sumB += kd * blueD * color.b * dotProd_d + ks * blueS * pow(dotProd_s, specC);
 
 	}
 
@@ -416,18 +436,58 @@ rgbf getColor(Point orig, Vector ray, int recLeft) {
 	double dp = dot(ray, norm);
 
 
+
 	Vector nRay = ray - 2 * dp * norm;
 	nRay.normalize();
 
-	toAdd = getColor(worldcord, nRay, recLeft - 1);
 
-	//printf(" %f, %f, %f \n", toAdd.rf, toAdd.gf, toAdd.bf);
+	toAdd = getColor(thanksRemco, nRay, recLeft - 1);
 
-	toR.rf = red + toAdd.rf;
-	toR.gf = green + toAdd.gf;
-	toR.bf = blue + toAdd.bf;
+	toR.rf = fix(red + fix(toAdd.rf));
+	toR.gf = fix(green + fix(toAdd.gf));
+	toR.bf = fix(blue + fix(toAdd.bf));
 
 	return toR;
+}
+
+bool notClear(Point me, Point light){
+
+	objNode* iter = head;
+	objNode* theObj = NULL;
+	double t;
+
+	Vector dir = me - light;
+	double dist = dir.length();
+	dir.normalize();
+
+	while (iter != NULL) {
+
+		// t is the dist from the light to cur object
+		t = getShapeSpecIntersect(light, iter, dir);
+		if (isEqual(t, -1.0)){
+			iter = iter->next;
+			continue;
+		}
+
+		if (t < dist){
+			return true;
+		}
+		iter = iter->next;
+	}
+
+	return false;
+}
+
+
+
+double fix(double d){
+	if (d > 1.0){
+		return 1.0;
+	}
+	if (d < 0.0){
+		return 0.0;
+	}
+	return d;
 }
 
 
@@ -688,6 +748,8 @@ int main(int argc, char* argv[])
 	GLUI_Panel *rec_panel = glui->add_panel("Assignment 5");
 	(new GLUI_Spinner(rec_panel, "Recurse:", &noRec))
 		->set_int_limits(0, 4);
+	(new GLUI_Spinner(rec_panel, "Spec Const:", &specC))
+		->set_int_limits(1, 500);
 	
 	GLUI_Panel *camera_panel = glui->add_panel("Camera");
 	(new GLUI_Spinner(camera_panel, "RotateV:", &camRotV))

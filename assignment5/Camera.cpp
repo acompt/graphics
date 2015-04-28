@@ -237,6 +237,6 @@ double Camera::GetFilmPlanDepth() {
 }
 
 double Camera::GetScreenWidthRatio() {
-
-	return screenWidthRatio;
+	return 1.0;
+//	return screenWidthRatio;
 }
