@@ -49,10 +49,6 @@ int noRec = 1;
 int specC = 100;
 double arb_dist = 200;
 
-
-double windowXSize = 500;
-double windowYSize = 500;
-
 double fix(double d);
 
 bool notClear(Point me, Point light);
@@ -63,6 +59,8 @@ void addObject(SceneNode* node, Matrix curMat);
 double getShapeSpecIntersect(Point orig, objNode* iter, Vector ray);
 void putPixel(int i, int j, double smallest_t, Vector norm, objNode* obj, Point worldcord);
 Vector getShapeSpecNormal(Point orig, objNode* iter, Vector ray, double t);
+rgbf getTexture(objNode* iter, SceneFileMap* texture, Point orig);
+void getPPMFile(string file); 
 
 /** These are GLUI control panel objects ***/
 int  main_window;
@@ -72,6 +70,8 @@ GLubyte* pixels = NULL;
 
 int pixelWidth = 0, pixelHeight = 0;
 int screenWidth = 0, screenHeight = 0;
+vector<char> ppmFile;
+string filename = NULL;
 
 /** these are the global variables used for rendering **/
 Cube* cube = new Cube();
@@ -283,7 +283,7 @@ void callback_start(int id) {
 				blueInt = 255;
 			}
 
-			setPixel(pixels, i, pixelHeight - j, redInt, greenInt, blueInt);
+			setPixel(pixels, i, pixelHeight - j - 1, redInt, greenInt, blueInt);
 		}
 	}
 	glutPostRedisplay();
@@ -295,6 +295,7 @@ rgbf getColor(Point orig, Vector ray, int recLeft) {
 	SceneLightData data;
 	SceneGlobalData global_data;
 	SceneColor color;
+	SceneFileMap* texture;
 
 	double red, green, blue, redA, greenA, blueA, redD, greenD, blueD;
 	double redS, greenS, blueS, redR, greenR, blueR, sumR, sumG, sumB;
@@ -357,6 +358,20 @@ rgbf getColor(Point orig, Vector ray, int recLeft) {
 	float kd = global_data.kd;
 	float ks = global_data.ks;
 
+	texture = theObj->material.textureMap;
+
+	if(texture != NULL && texture->isUsed) {
+		rgbf textR;
+		Point text = Point(getTexture(theObj, texture, orig));
+
+		if(filename != texture->filename) {
+			getPPMFile(filename);
+		}
+
+		
+
+		return textR;
+	}
 
 	redA = theObj->material.cAmbient.r;
 	greenA = theObj->material.cAmbient.g;
@@ -481,7 +496,19 @@ bool notClear(Point me, Point light){
 	return false;
 }
 
-
+void getPPMFile(string file) {
+	ifstream myfile;
+	if (!myfile.open(file, ios::in | ios::binary){
+    	cout << "Failed to open" << endl;
+	}
+	
+	vector<char> newFile;
+	while (myfile >> pixel){
+	    newFile.push_back(pixel);
+	}
+	myfile.close();
+	ppmFile = newFile;
+}
 
 double fix(double d){
 	if (d > 1.0){
@@ -493,6 +520,30 @@ double fix(double d){
 	return d;
 }
 
+Point getTexture(objNode* iter, SceneFileMap* texture, Point orig) {
+
+	Point toR;
+	Point ep = orig;
+	Matrix M = iter->M; // Transformation FROM object TO world
+
+	Matrix inv = invert(M);
+
+	Point ep_obj = inv * ep;
+
+	if (iter->type == SHAPE_CUBE) {
+		toR = cube->getTextureMap(texture, ep_obj);
+	}
+	else if (iter->type == SHAPE_CYLINDER) {
+		toR = cylinder->getTextureMap(texture, ep_obj);
+	}
+	else if (iter->type == SHAPE_CONE){
+		toR = cone->getTextureMap(texture, ep_obj);
+	}
+	else if (iter->type == SHAPE_SPHERE){
+		toR = sphere->getTextureMap(texture, ep_obj);
+	}
+	return toR;
+}
 
 double getShapeSpecIntersect(Point orig, objNode* iter, Vector ray){
 
