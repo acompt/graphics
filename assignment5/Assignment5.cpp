@@ -79,7 +79,7 @@ Vector getShapeSpecNormal(Point orig, objNode* iter, Vector ray, double t);
 
 /** These are GLUI control panel objects ***/
 int  main_window;
-string filenamePath = "./data/tests/all_objects.xml";
+string filenamePath = "./data/tests/earthcube.xml";
 GLUI_EditText* filenameTextField = NULL;
 GLubyte* pixels = NULL;
 
@@ -549,7 +549,7 @@ void readInImage(objNode* theObj) {
 	SceneFileMap* texture = theObj->material.textureMap;
 	string filename = texture -> filename;
 
-   	string s, crap;
+   	string s;
 	int r, g, b;
 
 	// printf("GOT HERE\n");
@@ -557,19 +557,38 @@ void readInImage(objNode* theObj) {
     ifstream file;
     file.open (filename);
 	std::string word;
+	string crap;
 
 	// The magic number
 	file >> word;
 
-	// TODO ! ! ! BURN ONE LINE HERE IF COMMENT
+	getline(file, crap);
+	getline(file, word);
 
-	// STORE WIDTH
-	file >> word;
-	(theObj -> imW) = atoi(word.c_str());
-
-	// STORE HEIGHT
-	file >> word;
-	(theObj -> imH) = atoi(word.c_str());
+	if (word[0] == '#') {
+		// STORE WIDTH
+		file >> word;
+		(theObj -> imW) = atoi(word.c_str());
+		// STORE HEIGHT
+		file >> word;
+		(theObj -> imH) = atoi(word.c_str());
+	}
+	else {
+		int i = 0;
+		string wid = "";
+		string hit = "";
+		while(word[i] != ' ') {
+			wid += word[i];
+			i++;
+		}
+		while(word[i] != '\n') {
+			hit += word[i];
+			i++;
+		}
+		(theObj -> imW) = atoi(wid.c_str());
+		(theObj -> imH) = atoi(hit.c_str());
+	}
+		
 
 	// STORE MAX
 	file >> word;
