@@ -31,6 +31,12 @@ struct rgbf {
 	double bf;
 };
 
+struct rgbi {
+	int r;
+	int g;
+	int b;
+};
+
 /** These are the live variables passed into GLUI ***/
 int  isectOnly = 1;
 
@@ -70,8 +76,10 @@ GLubyte* pixels = NULL;
 
 int pixelWidth = 0, pixelHeight = 0;
 int screenWidth = 0, screenHeight = 0;
-vector<char> ppmFile;
+vector<rgbi> ppmFile;
 string filename = NULL;
+int textwidth = 0;
+int textheight = 0;
 
 /** these are the global variables used for rendering **/
 Cube* cube = new Cube();
@@ -300,7 +308,7 @@ rgbf getColor(Point orig, Vector ray, int recLeft) {
 	double red, green, blue, redA, greenA, blueA, redD, greenD, blueD;
 	double redS, greenS, blueS, redR, greenR, blueR, sumR, sumG, sumB;
 	double dotProd_d, dotProd_s;
-	double u, v, s, t;
+	double u, v, s, t1;
 	Vector norm, Lm, Ri, Vhat;
 	Point worldcord;
 
@@ -374,8 +382,8 @@ rgbf getColor(Point orig, Vector ray, int recLeft) {
 		Point text = getTexture(theObj, orig);
 
 		// Find out which block our point is in
-		int u_block = floor(text[0] * repeatU);
-		int v_block = floor(text[1] * repeatV);
+		int u_block = floor(text[0] * u);
+		int v_block = floor(text[1] * v);
 
 		// Find out the width and height of SMALL blocks in terms of unit square
 		double b_wid = 1.0 / float(u);
@@ -388,17 +396,21 @@ rgbf getColor(Point orig, Vector ray, int recLeft) {
 		// Find s, t between 0.0 and 1.0, x and y values FOR ONE IMAGE.
 		// Mult these by pixel width and height from image to get color.
 		s = b_x / b_wid;
-		t = b_y / b_hei;
+		t1 = b_y / b_hei;
 
 		if(filename != texture->filename) {
-			// getPPMFile(filename);
+			//getPPMFile(filename);
 		}
 
-		
+		int w, h;
 
+		w = textwidth * s;
 
+		h = textheight* t1;			
 
-
+		textR.rf = ppmFile[w*h].r;
+		textR.gf = ppmFile[w*h].g;
+		textR.bf = ppmFile[w*h].b;
 
 		return textR;
 	}
@@ -526,19 +538,31 @@ bool notClear(Point me, Point light){
 	return false;
 }
 
-void getPPMFile(string file) {
-	ifstream myfile;
-	if (!myfile.open(file, ios::in | ios::binary){
-    	cout << "Failed to open" << endl;
-	}
+// void getPPMFile(string file) {
+
+// 	vector<rgbi> newFile;
+// 	string s, crap;
+// 	int r, g, b;
+
+// 	ifstream f(file.c_str(), ios::binary);
+//     if (f.fail())
+//     {
+//         cout << "Could not open file: " << file << endl;
+//         return;
+//     }
+
+//     f >> s >> crap >> textwidth >> textheight;
 	
-	vector<char> newFile;
-	while (myfile >> pixel){
-	    newFile.push_back(pixel);
-	}
-	myfile.close();
-	ppmFile = newFile;
-}
+// 	while (f >> r >> g >> b){
+// 		rgbi pixel;
+// 		pixel.r = r;
+// 		pixel.g = g;
+// 		pixel.b = b;
+// 	    newFile.push_back(pixel);
+// 	}
+// 	f.close();
+// 	ppmFile = newFile;
+// }
 
 double fix(double d){
 	if (d > 1.0){
