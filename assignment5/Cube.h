@@ -28,6 +28,7 @@ public:
 
 	double Intersect(Point eyePointP, Vector rayV, Matrix transformMatrix);
 	Vector findIsectNormal(Point eyePoint, Vector ray, double dist);
+	Point getTextureMap(SceneFileMap* texture, Point orig);
 	
 
 protected:
