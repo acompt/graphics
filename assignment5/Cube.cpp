@@ -123,6 +123,8 @@ Point Cube::getTextureMap(Point orig){
 
 	Point toR;
 
+	// printf("%f, %f, %f\n", orig[0], orig[1], orig[2]);
+
 	toR[2] = 0.0;
 
 	//top
@@ -160,6 +162,7 @@ Point Cube::getTextureMap(Point orig){
 		toR[0] = 1 - (orig[2] + 0.5);
 		toR[1] = 1 - (orig[1] + 0.5); 
 	}
+	// printf("  %f, %f, %f\n", toR[0], toR[1], toR[2]);
 
 	return toR;
 }

@@ -18,11 +18,22 @@
 
 using namespace std;
 
+struct rgb_pix {
+	int r;
+	int g;
+	int b;
+};
+
 struct objNode {
 	PrimitiveType type;
 	Matrix M;
 	SceneMaterial material;
 	objNode* next;
+	rgb_pix** image;
+	int imW;
+	int imH;
+	int imMax;
+
 };
 
 struct rgbf {
@@ -31,11 +42,8 @@ struct rgbf {
 	double bf;
 };
 
-struct rgbi {
-	int r;
-	int g;
-	int b;
-};
+
+
 
 /** These are the live variables passed into GLUI ***/
 int  isectOnly = 1;
@@ -55,8 +63,11 @@ int noRec = 1;
 int specC = 100;
 double arb_dist = 200;
 
+
 double fix(double d);
 
+void readInImage(objNode* theObj);
+Point getTexture(objNode* iter, Point orig);
 bool notClear(Point me, Point light);
 rgbf getColor(Point orig, Vector ray, int recLeft);
 static bool isEqual(double i, double j);
@@ -65,21 +76,15 @@ void addObject(SceneNode* node, Matrix curMat);
 double getShapeSpecIntersect(Point orig, objNode* iter, Vector ray);
 void putPixel(int i, int j, double smallest_t, Vector norm, objNode* obj, Point worldcord);
 Vector getShapeSpecNormal(Point orig, objNode* iter, Vector ray, double t);
-Point getTexture(objNode* iter, Point orig);
-void getPPMFile(string file); 
 
 /** These are GLUI control panel objects ***/
 int  main_window;
-string filenamePath = "./shinyballs.xml";
+string filenamePath = "./data/tests/all_objects.xml";
 GLUI_EditText* filenameTextField = NULL;
 GLubyte* pixels = NULL;
 
 int pixelWidth = 0, pixelHeight = 0;
 int screenWidth = 0, screenHeight = 0;
-vector<rgbi> ppmFile;
-string filename = NULL;
-int textwidth = 0;
-int textheight = 0;
 
 /** these are the global variables used for rendering **/
 Cube* cube = new Cube();
@@ -204,6 +209,7 @@ void setupCamera();
 void updateCamera();
 
 void setPixel(GLubyte* buf, int x, int y, int r, int g, int b) {
+
 	buf[(y*pixelWidth + x) * 3 + 0] = (GLubyte)r;
 	buf[(y*pixelWidth + x) * 3 + 1] = (GLubyte)g;
 	buf[(y*pixelWidth + x) * 3 + 2] = (GLubyte)b;
@@ -303,12 +309,10 @@ rgbf getColor(Point orig, Vector ray, int recLeft) {
 	SceneLightData data;
 	SceneGlobalData global_data;
 	SceneColor color;
-	SceneFileMap* texture;
 
 	double red, green, blue, redA, greenA, blueA, redD, greenD, blueD;
 	double redS, greenS, blueS, redR, greenR, blueR, sumR, sumG, sumB;
 	double dotProd_d, dotProd_s;
-	double u, v, s, t1;
 	Vector norm, Lm, Ri, Vhat;
 	Point worldcord;
 
@@ -361,29 +365,42 @@ rgbf getColor(Point orig, Vector ray, int recLeft) {
 	}
 
 
-	parser->getGlobalData(global_data);
 
-	float ka = global_data.ka;
-	float kd = global_data.kd;
-	float ks = global_data.ks;
-
-	texture = theObj->material.textureMap;
+	SceneFileMap* texture = theObj->material.textureMap;
 
 	if(texture != NULL && texture->isUsed) {
+
 		rgbf textR;
 
 		textR.rf = 0.0;
 		textR.gf = 0.0;
 		textR.bf = 0.0;
 
-		u = texture -> repeatU;
-		v = texture -> repeatV;
+		int u = texture -> repeatU;
+		int v = texture -> repeatV;
 
-		Point text = getTexture(theObj, orig);
+		// printf("%f %f\n",u, v );
+
+
+
+		Point text = getTexture(theObj, worldcord);
+
+		//printf("%f, %f\n", text[0], text[1] );
+
 
 		// Find out which block our point is in
-		int u_block = floor(text[0] * u);
-		int v_block = floor(text[1] * v);
+
+		float u_x = text[0] * float(u);
+		float v_x = text[1] * float(v);
+
+		int u_block = int(floor(u_x));
+		int v_block = int(floor(v_x));
+
+		// printf("%d %d  \n", u_block, v_block);
+
+
+		// printf("%f %f\n",u_block, v_block );
+
 
 		// Find out the width and height of SMALL blocks in terms of unit square
 		double b_wid = 1.0 / float(u);
@@ -391,29 +408,42 @@ rgbf getColor(Point orig, Vector ray, int recLeft) {
 
 		// Find out x and y in single square in terms of unit square
 		double b_x = text[0] - u_block * b_wid;
-		double b_y = text[1] = v_block * b_hei;
+		double b_y = text[1] - v_block * b_hei;
 
 		// Find s, t between 0.0 and 1.0, x and y values FOR ONE IMAGE.
 		// Mult these by pixel width and height from image to get color.
-		s = b_x / b_wid;
-		t1 = b_y / b_hei;
+		double fs = b_x / b_wid;
+		double ft = b_y / b_hei;
 
-		if(filename != texture->filename) {
-			//getPPMFile(filename);
+
+		if (theObj -> image == NULL) {
+
+			readInImage(theObj);
 		}
 
 		int w, h;
+	
+		w = (theObj -> imW) * fs;
+		h = (theObj -> imH) * ft;	
 
-		w = textwidth * s;
+		// printf("%d\n", (theObj -> image)[w][h].r);		
 
-		h = textheight* t1;			
+		rgb_pix toDraw = (theObj -> image)[w][h];
+		// printf("GOT HERE\n");
 
-		textR.rf = ppmFile[w*h].r;
-		textR.gf = ppmFile[w*h].g;
-		textR.bf = ppmFile[w*h].b;
+		textR.rf = float(toDraw.r) / float(theObj -> imMax);
+		textR.gf = float(toDraw.g) / float(theObj -> imMax);
+		textR.bf = float(toDraw.b) / float(theObj -> imMax);
+		//printf("%f, %f, %f\n", textR.rf, textR.gf, textR.bf);
 
 		return textR;
 	}
+
+	parser->getGlobalData(global_data);
+
+	float ka = global_data.ka;
+	float kd = global_data.kd;
+	float ks = global_data.ks;
 
 	redA = theObj->material.cAmbient.r;
 	greenA = theObj->material.cAmbient.g;
@@ -510,6 +540,98 @@ rgbf getColor(Point orig, Vector ray, int recLeft) {
 	return toR;
 }
 
+
+
+
+void readInImage(objNode* theObj) {
+
+
+	SceneFileMap* texture = theObj->material.textureMap;
+	string filename = texture -> filename;
+
+   	string s, crap;
+	int r, g, b;
+
+	// printf("GOT HERE\n");
+
+    ifstream file;
+    file.open (filename);
+	std::string word;
+
+	// The magic number
+	file >> word;
+
+	// TODO ! ! ! BURN ONE LINE HERE IF COMMENT
+
+	// STORE WIDTH
+	file >> word;
+	(theObj -> imW) = atoi(word.c_str());
+
+	// STORE HEIGHT
+	file >> word;
+	(theObj -> imH) = atoi(word.c_str());
+
+	// STORE MAX
+	file >> word;
+	(theObj -> imMax) = atoi(word.c_str());
+
+
+    (theObj -> image) = new rgb_pix*[theObj -> imW];
+
+    for (int a = 0; a < (theObj -> imW); a++){
+    	(theObj -> image)[a] = new rgb_pix[theObj -> imH];
+    }
+    	
+    for (int j = 0; j < (theObj -> imH); j++){
+    	for (int i = 0; i < (theObj -> imW); i++){
+
+
+			file >> word;
+			((theObj -> image)[i][j]).r = atoi(word.c_str());
+			file >> word;
+			((theObj -> image)[i][j]).g = atoi(word.c_str());
+			file >> word;
+			((theObj -> image)[i][j]).b = atoi(word.c_str());
+
+			//printf(" %d %d %d\n", ((theObj -> image)[i][j]).r, ((theObj -> image)[i][j]).g, ((theObj -> image)[i][j]).b  );
+
+
+    	}
+    }
+
+	file.close();
+}
+
+
+Point getTexture(objNode* iter, Point orig) {
+
+	// printf("%f, %f, %f\n", orig[0], orig[1], orig[2]);
+
+
+	Point toR;
+	Point pnt = orig;
+	Matrix M = iter->M; // Transformation FROM object TO world
+
+	Matrix inv = invert(M);
+
+	Point pnt_obj = inv * pnt;
+
+	if (iter->type == SHAPE_CUBE) {
+		toR = cube->getTextureMap(pnt_obj);
+	}
+	else if (iter->type == SHAPE_CYLINDER) {
+		toR = cylinder->getTextureMap(pnt_obj);
+	}
+	else if (iter->type == SHAPE_CONE){
+		toR = cone->getTextureMap(pnt_obj);
+	}
+	else if (iter->type == SHAPE_SPHERE){
+		toR = sphere->getTextureMap(pnt_obj);
+	}
+	return toR;
+}
+
+
 bool notClear(Point me, Point light){
 
 	objNode* iter = head;
@@ -538,31 +660,7 @@ bool notClear(Point me, Point light){
 	return false;
 }
 
-// void getPPMFile(string file) {
 
-// 	vector<rgbi> newFile;
-// 	string s, crap;
-// 	int r, g, b;
-
-// 	ifstream f(file.c_str(), ios::binary);
-//     if (f.fail())
-//     {
-//         cout << "Could not open file: " << file << endl;
-//         return;
-//     }
-
-//     f >> s >> crap >> textwidth >> textheight;
-	
-// 	while (f >> r >> g >> b){
-// 		rgbi pixel;
-// 		pixel.r = r;
-// 		pixel.g = g;
-// 		pixel.b = b;
-// 	    newFile.push_back(pixel);
-// 	}
-// 	f.close();
-// 	ppmFile = newFile;
-// }
 
 double fix(double d){
 	if (d > 1.0){
@@ -574,30 +672,6 @@ double fix(double d){
 	return d;
 }
 
-Point getTexture(objNode* iter, Point orig) {
-
-	Point toR;
-	Point pnt = orig;
-	Matrix M = iter->M; // Transformation FROM object TO world
-
-	Matrix inv = invert(M);
-
-	Point pnt_obj = inv * pnt;
-
-	if (iter->type == SHAPE_CUBE) {
-		toR = cube->getTextureMap(pnt_obj);
-	}
-	else if (iter->type == SHAPE_CYLINDER) {
-		toR = cylinder->getTextureMap(pnt_obj);
-	}
-	else if (iter->type == SHAPE_CONE){
-		toR = cone->getTextureMap(pnt_obj);
-	}
-	else if (iter->type == SHAPE_SPHERE){
-		toR = sphere->getTextureMap(pnt_obj);
-	}
-	return toR;
-}
 
 double getShapeSpecIntersect(Point orig, objNode* iter, Vector ray){
 
