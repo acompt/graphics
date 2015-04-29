@@ -300,6 +300,7 @@ rgbf getColor(Point orig, Vector ray, int recLeft) {
 	double red, green, blue, redA, greenA, blueA, redD, greenD, blueD;
 	double redS, greenS, blueS, redR, greenR, blueR, sumR, sumG, sumB;
 	double dotProd_d, dotProd_s;
+	double u, v, s, t;
 	Vector norm, Lm, Ri, Vhat;
 	Point worldcord;
 
@@ -362,13 +363,42 @@ rgbf getColor(Point orig, Vector ray, int recLeft) {
 
 	if(texture != NULL && texture->isUsed) {
 		rgbf textR;
+
+		textR.rf = 0.0;
+		textR.gf = 0.0;
+		textR.bf = 0.0;
+
+		u = texture -> repeatU;
+		v = texture -> repeatV;
+
 		Point text = getTexture(theObj, orig);
+
+		// Find out which block our point is in
+		int u_block = floor(text[0] * repeatU);
+		int v_block = floor(text[1] * repeatV);
+
+		// Find out the width and height of SMALL blocks in terms of unit square
+		double b_wid = 1.0 / float(u);
+		double b_hei = 1.0 / float(v);
+
+		// Find out x and y in single square in terms of unit square
+		double b_x = text[0] - u_block * b_wid;
+		double b_y = text[1] = v_block * b_hei;
+
+		// Find s, t between 0.0 and 1.0, x and y values FOR ONE IMAGE.
+		// Mult these by pixel width and height from image to get color.
+		s = b_x / b_wid;
+		t = b_y / b_hei;
 
 		if(filename != texture->filename) {
 			// getPPMFile(filename);
 		}
 
 		
+
+
+
+
 
 		return textR;
 	}
