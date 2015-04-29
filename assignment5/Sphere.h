@@ -25,6 +25,8 @@ public:
 
 	void draw();
 
+	Point getTextureMap(Point orig);
+
 	void drawNormal();
 
 	void makeFaceList();
