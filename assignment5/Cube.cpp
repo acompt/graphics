@@ -188,14 +188,6 @@ Vector Cube::findIsectNormal(Point eyePoint, Vector ray, double dist){
 	return norm;
 }
 
-Point Cube::getTextureMap(SceneFileMap* texture, Point orig) {
-	float U, V, w, h;
-	U = texture->repeatU;
-	V = texture->repeatV;
-	w = 1/U;
-	h = 1/V;
-	return Point(orig[0]%w, orig[1]%h, 0.0f);
-}
 
 
 static bool isEqual(double i, double j) {

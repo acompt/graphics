@@ -59,7 +59,7 @@ void addObject(SceneNode* node, Matrix curMat);
 double getShapeSpecIntersect(Point orig, objNode* iter, Vector ray);
 void putPixel(int i, int j, double smallest_t, Vector norm, objNode* obj, Point worldcord);
 Vector getShapeSpecNormal(Point orig, objNode* iter, Vector ray, double t);
-rgbf getTexture(objNode* iter, SceneFileMap* texture, Point orig);
+Point getTexture(objNode* iter, Point orig);
 void getPPMFile(string file); 
 
 /** These are GLUI control panel objects ***/
@@ -362,10 +362,10 @@ rgbf getColor(Point orig, Vector ray, int recLeft) {
 
 	if(texture != NULL && texture->isUsed) {
 		rgbf textR;
-		Point text = Point(getTexture(theObj, texture, orig));
+		Point text = getTexture(theObj, orig);
 
 		if(filename != texture->filename) {
-			getPPMFile(filename);
+			// getPPMFile(filename);
 		}
 
 		
@@ -520,27 +520,27 @@ double fix(double d){
 	return d;
 }
 
-Point getTexture(objNode* iter, SceneFileMap* texture, Point orig) {
+Point getTexture(objNode* iter, Point orig) {
 
 	Point toR;
-	Point ep = orig;
+	Point pnt = orig;
 	Matrix M = iter->M; // Transformation FROM object TO world
 
 	Matrix inv = invert(M);
 
-	Point ep_obj = inv * ep;
+	Point pnt_obj = inv * pnt;
 
 	if (iter->type == SHAPE_CUBE) {
-		toR = cube->getTextureMap(texture, ep_obj);
+		toR = cube->getTextureMap(pnt_obj);
 	}
 	else if (iter->type == SHAPE_CYLINDER) {
-		toR = cylinder->getTextureMap(texture, ep_obj);
+		toR = cylinder->getTextureMap(pnt_obj);
 	}
 	else if (iter->type == SHAPE_CONE){
-		toR = cone->getTextureMap(texture, ep_obj);
+		toR = cone->getTextureMap(pnt_obj);
 	}
 	else if (iter->type == SHAPE_SPHERE){
-		toR = sphere->getTextureMap(texture, ep_obj);
+		toR = sphere->getTextureMap(pnt_obj);
 	}
 	return toR;
 }
